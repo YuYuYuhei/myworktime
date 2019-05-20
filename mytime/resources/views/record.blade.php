@@ -5,31 +5,52 @@
 @section('content')
 <div class="row">
     <div class="col-md-8 mx-auto">
-        <div class="form-group row">
-            <button type="button" class="btn btn-info btn-sm active ml-3">
-                開始時間
-            </button>
-        </div>
-        <div class="form-group row">
-            <button type="button" name="" class="btn btn-info btn-sm active ml-3 btn1">終了時刻</button>
-        </div>
-        <div class="form-group row">
-            <label class="col-md-3" for="sum">本日合計</label>
-            <div class="col-md-10">
-                <h4>合計時間表示</h4>
+        <form  action="{{ action('RecordController@punchIn') }}" method="post" enctype="multipart/form-data">
+            <!-- <div class="form-group row"> -->
+                    {{ csrf_field() }}
+                    <!-- <input type="datetime" name="punchIn">
+            </div> -->
+            <!-- <div class="form-group row">
+                <button type="button" name="" class="btn btn-info btn-sm active ml-3 btn1">終了時刻</button>
+            </div> -->
+            <!-- <div class="form-group row">
+                <label class="col-md-3" for="sum">本日合計</label>
+                <div class="col-md-10">
+                    <h4>合計時間表示</h4>
 
-                <p>{{ date('Y/n/j  H:i') }}</p>
+                    <p>{{ date('Y/n/j  H:i') }}</p>
+                </div>
+            </div> -->
+            <input type="hidden" name="user_id" value="{{ $user_id }}">
+            <input type="hidden" name="punchIn" value="{{ $punchIn }}">
+            <input type="hidden" name="punchOut" value="">
+            <div class="form-group row">
+                <label class="col-md-3" for="memo">メモ(備忘録)</label>
+                <div class="col-md-10">
+                    <textarea class="form-control" name="memo" rows="8" >{{ old('memo') }}</textarea>
+                </div>
             </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-md-3" for="body">メモ(備忘録)</label>
-            <div class="col-md-10">
-                <textarea class="form-control" name="body" rows="8" >{{ old('body') }}</textarea>
-            </div>
-        </div>
-        {{ csrf_field() }}
-        <input class="mr-2" type="submit" name="btn btn-primary" value="記録する">
-        <input type="reset" name="btn btn-primary" value="リセット">
+            <!-- <input class="mr-2" type="submit" name="btn btn-primary" value="記録する">
+            <input type="reset" name="btn btn-primary" value="リセット"> -->
+            <input type="submit" class="btn btn-info btn-sm active ml-3" value="出勤時間を記録する">
+        </form>
     </div>
 </div>
 @endsection
+
+
+<!-- Memo
+
+<form  action="{{ action('RecordController@punchIn') }}" method="post" enctype="multipart/form-data"></form>→formで囲んだところに関する処理の送信先を指定。この書き方でactionに飛ばす旨記載
+
+{{ csrf_field() }}→csrf対策。formタグの中などに入れねばならない
+
+<input type="hidden" name="punchIn" value="{{ $punchIn }}">
+→type hiddenは非表示データを送信
+→name属性はフォームの部品に名前をつける(カラム名とのリンクが多い)
+→value属性は送信される値を指定する
+
+<form></form>で囲む時は基本的にinputタグはセット。buttonタグだと反応しない
+→inputの便利な属性値をcheckしておく
+
+   -->

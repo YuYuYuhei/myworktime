@@ -36,4 +36,18 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function tasks() {
+        return $this->hasMany(Task::class);
+    }
 }
+
+
+
+/*Memo
+
+   public function tasks() {
+   →tasks functionはテーブル名でなければいけないという縛りはないがこのほうが分かりやすい。関連するデータ・テーブル数によってhas one, has many他の関数が定義されている
+
+
+*/

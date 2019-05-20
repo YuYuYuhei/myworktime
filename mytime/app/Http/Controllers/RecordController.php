@@ -3,6 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\User;
+use App\Task;
+use Carbon\Carbon;
+
 
 class RecordController extends Controller
 {
@@ -13,17 +18,27 @@ class RecordController extends Controller
      */
     public function index()
     {
-        return view('record');
+        $user_id = Auth::id();  //現在認証中のuser idを取得
+        $punchIn = Carbon::now(); //viewへのaccess時の時刻を取得
+        return view('record', compact('user_id', 'punchIn'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * 時間の登録
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function punchIn(Request $request)
     {
-        //
+        $tasks = new Task;  //Taskインスタンス作成→$tasksへ代入, この時点では空
+        $form = $request->all(); //$formにtasks tableのall dataを取得し代入
+
+        unset($form['_token']); //allではトークンも一緒なのでunsetで削除
+
+        $tasks->fill($form); //$formの内容を$tasksにfillする
+        $tasks->punchIn = Carbon::now(); //$tasksのpanchInに挿入しているFieldを上書き
+        $tasks->save(); //$tasksの中身をsaveする
+        return redirect('record');
     }
 
     /**
