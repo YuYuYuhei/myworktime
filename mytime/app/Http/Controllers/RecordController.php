@@ -78,19 +78,19 @@ class RecordController extends Controller
     {
         $user_id = Auth::id(); //ユーザーIDを取得
         $tasks = Task::where('user_id', $user_id)->latest()->first();
-        $punchIn = $tasks->punchIn;
-        $punchOut = $tasks->punchOut;
             //ユーザーの最新のテーブルの行を取得
             //->first()だとid番号の小さいやつから1つだけ取ってくる
             //->latest()->first()でid番号が最後のやつを1つだけ取ってくる
-        public fucntion diffTime($punchIn, $punchOut)
-        {
-            $diff = $punchOut - $punchIn;
-            return gmdate('h:i', $diff);
-        }
+        // $punchIn = $tasks->punchIn;
+        // $punchOut = $tasks->punchOut;
+        // public fucntion diffTime($punchIn, $punchOut)
+        // {
+        //     $diff = $punchOut - $punchIn;
+        //     return gmdate('h:i', $diff);
+        // }
 
         // return view('result', compact('user_id', 'tasks', '$punchIn', '$punchOut'));
-        return view('result', compact('user_id', 'tasks', '$punchIn', '$punchOut'));
+    return view('result', compact('user_id', 'tasks' /*,'$punchIn', '$punchOut'*/));
     }
 
 
