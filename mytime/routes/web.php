@@ -17,7 +17,7 @@ Route::get('/', function () {
 
 Route::get('record', 'RecordController@index')->middleware('auth');
 Route::post('record', 'RecordController@punchIn')->middleware('auth');
-Route::get('record/update', 'UpdateController@add')->middleware('auth');
+Route::get('update', 'RecordController@show')->middleware('auth');
 
 
 Auth::routes();

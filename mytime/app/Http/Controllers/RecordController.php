@@ -38,18 +38,7 @@ class RecordController extends Controller
         $tasks->fill($form); //$formの内容を$tasksにfillする
         $tasks->punchIn = Carbon::now(); //$tasksのpanchInに挿入しているFieldを上書き
         $tasks->save(); //$tasksの中身をsaveする
-        return redirect('record');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+        return redirect('update');
     }
 
     /**
@@ -58,9 +47,12 @@ class RecordController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request)
     {
-        //
+        $user_id = Auth::id();
+        $tasks = Task::where('user_id', $user_id)->first();
+            //ユーザーの最新のテーブルの行を取得
+        return view('update', compact('user_id', 'tasks'));
     }
 
     /**
@@ -69,7 +61,7 @@ class RecordController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit()
     {
         //
     }
