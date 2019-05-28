@@ -6,21 +6,7 @@
 <div class="row">
     <div class="col-md-8 mx-auto">
         <form  action="{{ action('RecordController@punchIn') }}" method="post" enctype="multipart/form-data">
-            <!-- <div class="form-group row"> -->
                     {{ csrf_field() }}
-                    <!-- <input type="datetime" name="punchIn">
-            </div> -->
-            <!-- <div class="form-group row">
-                <button type="button" name="" class="btn btn-info btn-sm active ml-3 btn1">終了時刻</button>
-            </div> -->
-            <!-- <div class="form-group row">
-                <label class="col-md-3" for="sum">本日合計</label>
-                <div class="col-md-10">
-                    <h4>合計時間表示</h4>
-
-                    <p>{{ date('Y/n/j  H:i') }}</p>
-                </div>
-            </div> -->
             <input type="hidden" name="user_id" value="{{ $user_id }}">
             <input type="hidden" name="punchIn" value="{{ $punchIn }}">
             <input type="hidden" name="punchOut" value="">

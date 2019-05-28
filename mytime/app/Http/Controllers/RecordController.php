@@ -49,9 +49,11 @@ class RecordController extends Controller
      */
     public function show(Request $request)
     {
-        $user_id = Auth::id();
-        $tasks = Task::where('user_id', $user_id)->first();
+        $user_id = Auth::id(); //ユーザーIDを取得
+        $tasks = Task::where('user_id', $user_id)->latest()->first();
             //ユーザーの最新のテーブルの行を取得
+            //->first()だとid番号の小さいやつから1つだけ取ってくる
+            //->latest()->first()でid番号が最後のやつを1つだけ取ってくる
         return view('update', compact('user_id', 'tasks'));
     }
 
@@ -61,10 +63,37 @@ class RecordController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit()
+    public function punchOut(Request $request)
     {
-        //
+        $user_id = Auth::id();
+        $tasks = Task::where('user_id', $user_id)->latest()->first();
+        $tasks->punchOut = Carbon::now();
+        $tasks->save();
+
+        return redirect('result');
     }
+
+
+    public function result(Request $request)
+    {
+        $user_id = Auth::id(); //ユーザーIDを取得
+        $tasks = Task::where('user_id', $user_id)->latest()->first();
+        $punchIn = $tasks->punchIn;
+        $punchOut = $tasks->punchOut;
+            //ユーザーの最新のテーブルの行を取得
+            //->first()だとid番号の小さいやつから1つだけ取ってくる
+            //->latest()->first()でid番号が最後のやつを1つだけ取ってくる
+        public fucntion diffTime($punchIn, $punchOut)
+        {
+            $diff = $punchOut - $punchIn;
+            return gmdate('h:i', $diff);
+        }
+
+        // return view('result', compact('user_id', 'tasks', '$punchIn', '$punchOut'));
+        return view('result', compact('user_id', 'tasks', '$punchIn', '$punchOut'));
+    }
+
+
 
     /**
      * Update the specified resource in storage.
