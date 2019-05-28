@@ -11,11 +11,8 @@ use Carbon\Carbon;
 
 class RecordController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
+    //display start button page
     public function index()
     {
         $user_id = Auth::id();  //現在認証中のuser idを取得
@@ -23,11 +20,7 @@ class RecordController extends Controller
         return view('record', compact('user_id', 'punchIn'));
     }
 
-    /**
-     * 時間の登録
-     *
-     * @return \Illuminate\Http\Response
-     */
+    //store start time to tasks table as punchIn column data
     public function punchIn(Request $request)
     {
         $tasks = new Task;  //Taskインスタンス作成→$tasksへ代入, この時点では空
@@ -41,12 +34,7 @@ class RecordController extends Controller
         return redirect('update');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    //display punchIn's time(tasks table) and display finish time button
     public function show(Request $request)
     {
         $user_id = Auth::id(); //ユーザーIDを取得
@@ -57,12 +45,7 @@ class RecordController extends Controller
         return view('update', compact('user_id', 'tasks'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    //display punchOut's time(tasks table) and display edit button
     public function punchOut(Request $request)
     {
         $user_id = Auth::id();
@@ -78,43 +61,34 @@ class RecordController extends Controller
     {
         $user_id = Auth::id(); //ユーザーIDを取得
         $tasks = Task::where('user_id', $user_id)->latest()->first();
-            //ユーザーの最新のテーブルの行を取得
-            //->first()だとid番号の小さいやつから1つだけ取ってくる
-            //->latest()->first()でid番号が最後のやつを1つだけ取ってくる
-        // $punchIn = $tasks->punchIn;
-        // $punchOut = $tasks->punchOut;
-        // public fucntion diffTime($punchIn, $punchOut)
-        // {
-        //     $diff = $punchOut - $punchIn;
-        //     return gmdate('h:i', $diff);
-        // }
 
-        // return view('result', compact('user_id', 'tasks', '$punchIn', '$punchOut'));
-    return view('result', compact('user_id', 'tasks' /*,'$punchIn', '$punchOut'*/));
+        $diff = $this->diffTime($tasks->punchIn, $tasks->punchOut);
+        // how many hours I worked
+        //thisで同クラス内の関数にアクセス
+        //引数部分はtaskに呼んできた行の情報をセット
+
+    return view('result', compact('user_id', 'tasks', 'diff'));
     }
 
 
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         //
     }
+    //  method to caluculate how many hours I worked
+    private function diffTime($punchIn, $punchOut) //ここでの引数はテーブルとの接続をとりあえず意識せずともOK
+    {
+        $start = strtotime($punchIn); //strtotime→これで数値化することによって計算できる
+        $end = strtotime($punchOut); //この関数を$start,$endなどと代入してやらないといけない
+        $diff = $end- $start;
+        return gmdate('h:i', $diff); //この計算式を適用したいAction内で使う
+    }
+
+
+
 }

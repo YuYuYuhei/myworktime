@@ -13,15 +13,7 @@ use Carbon\Carbon;
 class UpdateController extends Controller
 {
 
-    public function update(Request $request) {
-
-        $user_id = Auth::id();
-        $tasks = new Task;
-
-        $showPunchIn = new Carbon($tasks->punchIn);
-
-
-        return view('update', compact('user_id', 'showPunchIn'));
+    
        }
 
 

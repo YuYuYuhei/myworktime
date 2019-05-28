@@ -13,10 +13,10 @@
             <label class="col-md-3">退勤時間</label>
             <p>{{ $tasks->punchOut }}</p>
         </div>
-        <!-- <div class="form-group row">
+        <div class="form-group row">
             <label class="col-md-3">勤務時間</label>
-            <p></p>
-        </div> -->
+            <p>{{ $diff }} </p>
+        </div>
         <div class="form-group row">
             <label class="col-md-3" for="memo">メモ(備忘録)</label>
             <div class="col-md-10">
