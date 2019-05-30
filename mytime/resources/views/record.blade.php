@@ -5,6 +5,18 @@
 @section('content')
 <div class="row">
     <div class="col-md-8 mx-auto">
+        <div class="form-group row">
+            <label class="col-md-3">出勤時間</label>
+            <!-- <p> $tasks->punchIn </p> -->
+        </div>
+        <div class="form-group row">
+            <label class="col-md-3">退勤時間</label>
+            <!-- <p> $tasks->punchOut </p> -->
+        </div>
+        <div class="form-group row">
+            <label class="col-md-3">勤務時間</label>
+            <!-- <p> $diff  </p> -->
+        </div>
         <form  action="{{ action('RecordController@punchIn') }}" method="post" enctype="multipart/form-data">
                     {{ csrf_field() }}
             <input type="hidden" name="user_id" value="{{ $user_id }}">
@@ -26,17 +38,13 @@
 
 
 <!-- Memo
-
 <form  action="{{ action('RecordController@punchIn') }}" method="post" enctype="multipart/form-data"></form>→formで囲んだところに関する処理の送信先を指定。この書き方でactionに飛ばす旨記載
-
 {{ csrf_field() }}→csrf対策。formタグの中などに入れねばならない
-
 <input type="hidden" name="punchIn" value="{{ $punchIn }}">
 →type hiddenは非表示データを送信
 →name属性はフォームの部品に名前をつける(カラム名とのリンクが多い)
 →value属性は送信される値を指定する
-
 <form></form>で囲む時は基本的にinputタグはセット。buttonタグだと反応しない
 →inputの便利な属性値をcheckしておく
 
-   -->
+-->

@@ -13,8 +13,18 @@ use Carbon\Carbon;
 class UpdateController extends Controller
 {
 
-    
-       }
+    // public function showDatas(Request $request) {
+    //
+    //     $user_id = Auth::id();
+    //     $tasks = new Task;
+    //     $form = $request->all(); //$formにtasks tableのall dataを取得し代入
+    //     unset($form['_token']); //allではトークンも一緒なのでunsetで削除
+    //
+    //     $tasks->fill($form);
+    //
+    // 
+    //     return view('update', compact('user_id', 'showPunchIn'));
+    //    }
 
 
 
