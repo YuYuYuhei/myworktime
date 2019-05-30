@@ -7,3 +7,9 @@ body {
   width: 800px;
   margin: 20px auto;
 }
+
+.timeBtn li {
+    list-style: none;
+    display: block;
+    float: left;
+}

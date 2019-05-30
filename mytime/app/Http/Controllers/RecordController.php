@@ -11,43 +11,71 @@ use Carbon\Carbon;
 
 class RecordController extends Controller
 {
-    //display start button page
+    //display 新規作成ページ page
     public function index()
     {
-        $user_id = Auth::id();  //現在認証中のuser idを取得
-        $punchIn = Carbon::now(); //viewへのaccess時の時刻を取得
-        return view('record', compact('user_id', 'punchIn'));
+        $user_id = Auth::id();
+        //Get user's id
+        //Any previous data unnecessary because it's for creating new table
+
+        // 当アクションの残骸
+        // $punchIn = Carbon::now(); //viewへのaccess時の時刻を取得
+        // return view('record', compact('user_id', 'punchIn'));
+
+        return view('record', compact('user_id'));
     }
-    //store start time to tasks table as punchIn column data
-    public function punchIn(Request $request)
+
+    //store punchInTime to tasks table as punchIn column data
+    public function punchIn()
     {
-        $tasks = new Task;  //Taskインスタンス作成→$tasksへ代入, この時点では空
-        $form = $request->all(); //$formにtasks tableのall dataを取得し代入
-        unset($form['_token']); //allではトークンも一緒なのでunsetで削除
-        $tasks->fill($form); //$formの内容を$tasksにfillする
-        $tasks->punchIn = Carbon::now(); //$tasksのpanchInに挿入しているFieldを上書き
-        $tasks->save(); //$tasksの中身をsaveする
-        return redirect('update');
+        $user_id = Auth::id();  //Get user's id
+
+        $punchIn = Task::create([
+            'user_id' => $user_id,
+            'punchIn' => Carbon::now(),
+        ]);   // store [user_id, punchIn] when push「出勤時間を記録する」at [record.blade..php]
+
+        $tasks = Task::where('user_id', $user_id)->latest()->first();
+        $punchInTime = $tasks->punchIn;
+        // get latest row from [tasks table] and punchIn Data
+
+        // 当アクションの残骸
+        // $tasks = new Task;  //Taskインスタンス作成→$tasksへ代入, この時点では空
+        // $form = $request->all(); //$formにtasks tableのall dataを取得し代入
+        // unset($form['_token']); //allではトークンも一緒なのでunsetで削除
+        // $tasks->fill($form); //$formの内容を$tasksにfillする
+        // $tasks->punchIn = Carbon::now(); //$tasksのpanchInに挿入しているFieldを上書き
+        // $tasks->save(); //$tasksの中身をsaveする
+        // return redirect('update');
+
+        // return view('record', compact('user_id', 'punchIn', 'tasks', 'punchInTime'));
+        return redirect()->action('RecordController@show');
     }
+
     //display punchIn's time(tasks table) and display finish time button
     public function show(Request $request)
     {
-        $user_id = Auth::id(); //ユーザーIDを取得
+        $user_id = Auth::id(); // Get user's id
         $tasks = Task::where('user_id', $user_id)->latest()->first();
-            //ユーザーの最新のテーブルの行を取得
-            //->first()だとid番号の小さいやつから1つだけ取ってくる
-            //->latest()->first()でid番号が最後のやつを1つだけ取ってくる
-        return view('update', compact('user_id', 'tasks'));
+        $punchOut =  $tasks->punchOut;
+
+        return view('record', compact('user_id', 'tasks', 'punchOut'));
     }
+
+
     //display punchOut's time(tasks table) and display edit button
-    public function punchOut(Request $request)
+    public function punchOut(Request $request) //ここから！！
     {
-        $user_id = Auth::id();
-        $tasks = Task::where('user_id', $user_id)->latest()->first();
-        $tasks->punchOut = Carbon::now();
+        $user_id = Auth::id(); //Get user's id
+        $punchOut = Task::where('user_id', $user_id)->latest()->first();
+        $punchOut->punchOut = Carbon::now();
+
+
+
         $tasks->save();
         return redirect('result');
     }
+
     public function result(Request $request)
     {
         $user_id = Auth::id(); //ユーザーIDを取得
