@@ -8,18 +8,18 @@
         <section>
             <div class="form-group row">
                 <label class="col-md-3">出勤時間</label>
-                @isset($punchIn)
-                <p>{{ $punchInTime }}</p>
+                @isset($punchInTime)
+                    <p>{{ $punchInTime }}</p>
                 @else
-                <p></p>
+                    <p></p>
                 @endisset
             </div>
             <div class="form-group row">
                 <label class="col-md-3">退勤時間</label>
-                @isset( $punchOut )
-                <p> {{ $punchOutTime }} </p>
+                @isset( $punchOutTime )
+                    <p> {{ $punchOutTime }} </p>
                 @else
-                <p></p>
+                    <p></p>
                 @endisset
             </div>
             <div class="form-group row">
@@ -40,15 +40,15 @@
                 @isset( $punchInTime )
                     <input type="hidden" class="btn btn-info btn-sm active ml-3" value="出勤時間を記録する">
                 @else
-                    <input type="submit" class="btn btn-info btn-sm active ml-3" value="退勤時間を記録する">
+                    <input type="submit" class="btn btn-info btn-sm active ml-3" value="出勤時間を記録する">
                 @endisset
             </form>
             <!-- <form action="" method="post" enctype="multipart/form-data"> -->
                 @isset( $punchInTime )
-                    <input type="submit" class="btn btn-info btn-sm active ml-3" value="退勤時間を記録する">
+                    <input type="submit" class="btn btn-info btn-sm active ml-3" value="退勤時間を記録する" formaction=" ">
                 @else
                     <input type="hidden" class="btn btn-info btn-sm active ml-3" value="退勤時間を記録する">
-                @endempty
+                @endisset
             <!-- </form> -->
         </section>
     </div>
