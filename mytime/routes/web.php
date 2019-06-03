@@ -15,9 +15,10 @@ Route::get('/', function () {
 
 // Route::post('/records/create', 'RecordController@create')->middleware('auth');
 
-Route::get('records/create', 'RecordController@index')->middleware('auth');
-Route::post('records/create', 'RecordController@punchIn')->middleware('auth');
-Route::get('records/create', 'RecordController@show')->middleware('auth');
+Route::get('/', 'RecordController@index')->middleware('auth');
+Route::get('records/create', 'RecordController@create')->middleware('auth');
+Route::post('/punchIn', 'RecordController@storePunchIn')->middleware('auth');
+Route::post('/punchOut', 'RecordController@storePunchOut')->middleware('auth');
 // Route::post('record', 'RecordController@punchOut')->middleware('auth');
 // Route::get('record', 'RecordController@result')->middleware('auth');
 // Route::get('index', 'IndexController@add')->middleware('auth');

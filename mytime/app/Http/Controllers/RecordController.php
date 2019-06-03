@@ -10,26 +10,58 @@ use Carbon\Carbon;
 
 class RecordController extends Controller
 {
-    public function index()
-    {
-        $user_id = Auth::id();
-        //Get user's id  //Any previous data unnecessary because it's for creating new table
-        return view('records.create', compact('user_id'));
-    }
-    //store punchInTime to tasks table as punchIn(create) column data
-    public function punchIn()
+    public function index() // here is top page
     {
         $user_id = Auth::id();  //Get user's id
+        return view('records.index');
+    }
+
+    public function create() //create page of punchIn & punchOut
+    {
+        $user_id = Auth::id();  //Get user's id
+        return view('records.create');
+    }
+
+    public function storePunchIn(Request $request) // store punchIn data from create page
+    {
+        $user_id = Auth::id();  //Get user's id
+
         $punchIn = Task::create([
             'user_id' => $user_id,
             'punchIn' => Carbon::now(),
-        ]);   // store [user_id, punchIn] when push「出勤時間を記録する」at [record.blade..php]
+        ]);
+        $tasks = Task::where('user_id', $user_id)->latest()->first();
+        $punchInTime = $tasks->punchIn;
+
+        return view('records.create', compact('user_id', 'punchIn', '$tasks', 'punchInTime'));
+    }
+
+    public function storePunchOut(Request $request) // store punchOut data from create page
+    {
+        $user_id = Auth::id();  //Get user's id
+
+        $tasks = Task::where('user_id', $user_id)->latest()->first();
+        $tasks->punchOut = Carbon::now();
+        // $punchOut = Task::update([
+        //     'punchOut' => Carbon::now(),
+        // ]);
+        $punchOutTime = $tasks->punchOut;
+
+        return view('records.create', compact('user_id', 'tasks', '$punchOut', 'punchOutTime'));
+        // return redirect()->back();
+
+         // store [user_id, punchIn] when push「出勤時間を記録する」at [record.blade..php]
         // $tasks = Task::where('user_id', $user_id)->latest()->first();
         // $punchInTime = $tasks->punchIn;  // get latest row from [tasks table] and punchIn Data
 
-        return view('records.create', compact('user_id', 'punchIn', 'tasks', 'punchInTime'));
+        // return view('records.create', compact('user_id', 'punchIn', 'tasks', 'punchInTime'));
         // return redirect()->action('RecordController@edit');
     }
+
+
+
+
+
     // display punchIn's time(tasks table) and display finish time button
     public function show(Request $request)
     {

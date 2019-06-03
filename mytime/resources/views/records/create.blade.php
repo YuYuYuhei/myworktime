@@ -29,27 +29,29 @@
         </section>
 
         <section>
-            <form  action="{{ action('RecordController@punchIn') }}" method="post" enctype="multipart/form-data">
-                {{ csrf_field() }}
-                <div class="form-group row">
-                    <label class="col-md-3" for="memo">メモ(備忘録)</label>
-                    <div class="col-md-10">
-                        <textarea class="form-control" name="memo" rows="8" >{{ old('memo') }}</textarea>
+            @isset($punchInTime)
+                <form action="{{ action('RecordController@storePunchOut') }}" method="post" enctype="multipart/form-data">
+                    {{ csrf_field() }}
+                    <div class="form-group row">
+                        <label class="col-md-3" for="memo">メモ(備忘録)</label>
+                        <div class="col-md-10">
+                            <textarea class="form-control" name="memo" rows="8" >{{ old('memo') }}</textarea>
+                        </div>
                     </div>
-                </div>
-                @isset( $punchInTime )
-                    <input type="hidden" class="btn btn-info btn-sm active ml-3" value="出勤時間を記録する">
-                @else
-                    <input type="submit" class="btn btn-info btn-sm active ml-3" value="出勤時間を記録する">
-                @endisset
-            </form>
-            <!-- <form action="" method="post" enctype="multipart/form-data"> -->
-                @isset( $punchInTime )
                     <input type="submit" class="btn btn-info btn-sm active ml-3" value="退勤時間を記録する" formaction=" ">
-                @else
-                    <input type="hidden" class="btn btn-info btn-sm active ml-3" value="退勤時間を記録する">
-                @endisset
-            <!-- </form> -->
+                </form>
+            @else
+                <form  action="{{ action('RecordController@storePunchIn') }}" method="post" enctype="multipart/form-data">
+                    {{ csrf_field() }}
+                    <div class="form-group row">
+                        <label class="col-md-3" for="memo">メモ(備忘録)</label>
+                        <div class="col-md-10">
+                            <textarea class="form-control" name="memo" rows="8" >{{ old('memo') }}</textarea>
+                        </div>
+                    </div>
+                        <input type="submit" class="btn btn-info btn-sm active ml-3" value="出勤時間を記録する">
+                </form>
+            @endisset
         </section>
     </div>
 </div>
