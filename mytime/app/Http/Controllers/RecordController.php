@@ -19,7 +19,9 @@ class RecordController extends Controller
     public function create() //create page of punchIn & punchOut
     {
         $user_id = Auth::id();  //Get user's id
-        return view('records.create');
+        $punchInTime = "";
+        $punchOutTime = "";
+        return view('records.create' , compact('user_id', 'punchInTime', 'punchOutTime'));
     }
 
     public function storePunchIn(Request $request) // store punchIn data from create page
@@ -32,8 +34,10 @@ class RecordController extends Controller
         ]);
         $tasks = Task::where('user_id', $user_id)->latest()->first();
         $punchInTime = $tasks->punchIn;
-
-        return view('records.create', compact('user_id', 'punchIn', '$tasks', 'punchInTime'));
+        $punchOutTime = $tasks->punchOut;
+        $diff = "";
+        return view('records.create',
+                       compact('user_id', 'punchIn', '$tasks', 'punchInTime', 'punchOutTime', 'diff'));
     }
 
     public function storePunchOut(Request $request) // store punchOut data from create page
@@ -42,23 +46,29 @@ class RecordController extends Controller
 
         $tasks = Task::where('user_id', $user_id)->latest()->first();
         $tasks->punchOut = Carbon::now();
-        // $punchOut = Task::update([
-        //     'punchOut' => Carbon::now(),
-        // ]);
+        $tasks->save();
+        $punchInTime = $tasks->punchIn;
         $punchOutTime = $tasks->punchOut;
+        $memo = $tasks->memo;
+        $diff = $this->diffTime($tasks->punchIn, $tasks->punchOut);
 
-        return view('records.create', compact('user_id', 'tasks', '$punchOut', 'punchOutTime'));
-        // return redirect()->back();
-
-         // store [user_id, punchIn] when push「出勤時間を記録する」at [record.blade..php]
-        // $tasks = Task::where('user_id', $user_id)->latest()->first();
-        // $punchInTime = $tasks->punchIn;  // get latest row from [tasks table] and punchIn Data
-
-        // return view('records.create', compact('user_id', 'punchIn', 'tasks', 'punchInTime'));
-        // return redirect()->action('RecordController@edit');
+        return view('records.create',
+                       compact('user_id', 'tasks', '$punchOut', 'punchInTime', 'punchOutTime', 'memo', 'diff'));
     }
 
+    public function storeMemo(Request $request) // store Memo
+    {
+        $user_id = Auth::id();  //Get user's id
+        $tasks = Task::where('user_id', $user_id)->latest()->first();
+        $tasks->memo = $request->memo;
+        //動的にデータを処理している..はず
+        // Task::update([ memo=... ])はstatic的な方法なのでここではエラーになる
+        $punchInTime = $tasks->punchIn;
+        $punchOutTime = $tasks->punchOut;
+        $tasks->save();
 
+        return redirect('/');
+    }
 
 
 
@@ -80,7 +90,7 @@ class RecordController extends Controller
         $tasks->punchOut = Carbon::now();
         $punchOutTime = $tasks->punchOut;
         // $tasks->save();
-        return redirectview('records.create', compact('user_id','tasks', 'punchOutTime'));
+        return view('records.create', compact('user_id','tasks', 'punchOutTime'));
     }
     public function result(Request $request)
     {
