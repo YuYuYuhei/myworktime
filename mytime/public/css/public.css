@@ -13,3 +13,50 @@ body {
     display: block;
     float: left;
 }
+
+/* index.blade.php+create.blade.php */
+
+.top-menu {
+    border-bottom: 2px solid #808080;
+    padding-bottom: 5px;
+}
+
+.top-menu h1 {
+    font-size: 20px;
+}
+
+.top-menu a {
+    font-size: 20px;
+    text-decoration: none;
+    float: right;
+}
+
+
+/* index.blade.php */
+
+.my-records  {
+    margin-top: 40px;
+}
+
+.my-records  h1 > a {
+    text-decoration: none;
+    font-size: 17px
+}
+
+.prev-month {
+    float: left;
+}
+
+.next-month {
+    float: right;
+}
+
+/* .next {
+    float: right;
+} */
+
+
+/* create.blade.php */
+.display-area {
+    margin-top: 50px;
+}
