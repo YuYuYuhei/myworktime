@@ -99,6 +99,14 @@ class RecordController extends Controller
         return redirect('/');
     }
 
+    public function edit(Request $request)
+    {
+        $user_id = Auth::id();
+        $tasks = Task::find($request->id);
+
+        
+    }
+
 
 
     // display punchIn's time(tasks table) and display finish time button

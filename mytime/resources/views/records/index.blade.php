@@ -16,9 +16,6 @@
                 <a href="" class="prev-month"><<先月の記録</a>
                 <a href="" class="next-month">次月の記録>></a>
             </h1>
-            <!-- <h1 class="next">
-                <a href="">次月の記録>></a>
-            </h1> -->
             <table class="table table-bordered">
                 <thead class="thead-light">
                     <tr>
@@ -31,15 +28,15 @@
                 </thead>
                 <tbody>
                     @forelse ($tasks as $task)
-                        @if ($task->punchIn  === $dt)
-                            <tr>
-                                <th scope="row">{{ $date[ strval($task->id) ] }}</th>
-                                <td>{{ $punchIn[ strval($task->id) ] }}</td>
-                                <td>{{ $punchOut[ strval($task->id) ] }}</td>
-                                <td>{{ $task->workTime }}</td>
-                                <td>{{ $task->memo }}</td>
-                            </tr>
-                        @endif
+                        <!-- if ($task->punchIn  == $dt) -->
+                        <tr>
+                            <th scope="row"><a href="">{{ $date[ strval($task->id) ] }}</a></th>
+                            <td>{{ $punchIn[ strval($task->id) ] }}</td>
+                            <td>{{ $punchOut[ strval($task->id) ] }}</td>
+                            <td>{{ $task->workTime }}</td>
+                            <td>{{ $task->memo }}</td>
+                        </tr>
+                        <!-- endif -->
                     @empty
                         <p>まだ記録はありません。</p>
                     @endforelse

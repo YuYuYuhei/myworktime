@@ -20,6 +20,8 @@ Route::get('records/create', 'RecordController@create')->middleware('auth');
 Route::post('/punchIn', 'RecordController@storePunchIn')->middleware('auth');
 Route::post('/punchOut', 'RecordController@storePunchOut')->middleware('auth');
 Route::post('/store', 'RecordController@storeMemo')->middleware('auth');
+Route::get('records/edit', 'RecordController@edit')->middleware('auth');
+
 // Route::post('record', 'RecordController@punchOut')->middleware('auth');
 // Route::get('record', 'RecordController@result')->middleware('auth');
 // Route::get('index', 'IndexController@add')->middleware('auth');
