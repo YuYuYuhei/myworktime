@@ -30,7 +30,10 @@
                     @forelse ($tasks as $task)
                         <!-- if ($task->punchIn  == $dt) -->
                         <tr>
-                            <th scope="row"><a href="">{{ $date[ strval($task->id) ] }}</a></th>
+                            <th scope="row">
+                                <a href="{{ url('records', $task->id) }}">{{ $date[ strval($task->id) ] }}</a>
+                                <a href=" action('RecordController@edit', $task) "> [Edit]</a>
+                             </th>
                             <td>{{ $punchIn[ strval($task->id) ] }}</td>
                             <td>{{ $punchOut[ strval($task->id) ] }}</td>
                             <td>{{ $task->workTime }}</td>

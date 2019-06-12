@@ -34,9 +34,16 @@ class RecordController extends Controller
                 $punchOut[ strval($task->id) ] = Carbon::parse($task->punchOut)->format('H:i');
             }
         }
-
         return view('records.index', compact('user_id', 'dt', 'tasks', 'date', 'punchIn', 'punchOut'));
     }
+
+    public function show($id)
+    {
+        $task = Task::findOrFail($id);
+        return view('records.show');
+        // ->with('task', $task);
+    }
+
 
     public function create() //create page of punchIn & punchOut
     {
@@ -99,26 +106,26 @@ class RecordController extends Controller
         return redirect('/');
     }
 
-    public function edit(Request $request)
-    {
-        $user_id = Auth::id();
-        $tasks = Task::find($request->id);
-
-        
-    }
+    // public function edit(Request $request, Task $task)
+    // {
+    //     $user_id = Auth::id();
+    //     $tasks = Task::find($request->id);
+    //
+    //     return view('records/edit', compact('user_id', 'tasks'))->with('task', $task);
+    // }
 
 
 
     // display punchIn's time(tasks table) and display finish time button
-    public function show(Request $request)
-    {
-        $user_id = Auth::id(); // Get user's id
-        $tasks = Task::where('user_id', $user_id)->latest()->first();
-
-        $punchInTime = $tasks->punchIn;
-        $punchOut =  $tasks->punchOut;
-        return view('records.create', compact('user_id', 'tasks', 'punchOut'));
-    }
+    // public function show(Request $request)
+    // {
+    //     $user_id = Auth::id(); // Get user's id
+    //     $tasks = Task::where('user_id', $user_id)->latest()->first();
+    //
+    //     $punchInTime = $tasks->punchIn;
+    //     $punchOut =  $tasks->punchOut;
+    //     return view('records.create', compact('user_id', 'tasks', 'punchOut'));
+    // }
     //display punchOut's time(tasks table) and display edit button
     public function punchOut(Request $request) //ここから！！
     {
