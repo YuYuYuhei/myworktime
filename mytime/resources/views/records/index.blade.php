@@ -32,12 +32,13 @@
                         <tr>
                             <th scope="row">
                                 <a href="{{ url('records', $task->id) }}">{{ $date[ strval($task->id) ] }}</a>
-                                <a href=" action('RecordController@edit', $task) "> [Edit]</a>
+                                <a href="{{ action('RecordController@edit', $task->id) }} "> [Edit]</a>
                              </th>
                             <td>{{ $punchIn[ strval($task->id) ] }}</td>
                             <td>{{ $punchOut[ strval($task->id) ] }}</td>
                             <td>{{ $task->workTime }}</td>
                             <td>{{ $task->memo }}</td>
+                            <!-- For memo, I gonna show only 5 letters from beginning -->
                         </tr>
                         <!-- endif -->
                     @empty

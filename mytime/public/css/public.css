@@ -51,10 +51,13 @@ body {
     float: right;
 }
 
-/* .next {
-    float: right;
-} */
+/* show.blade.php */
 
+.texts {
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid black;
+}
 
 /* create.blade.php */
 .display-area {
