@@ -11,40 +11,6 @@ use Carbon\Carbon;
 
 class RecordController extends Controller
 {
-    public function index(Request $request) // here is top page
-    {
-        $dt = Carbon::now()->format("Y年m月の記録");
-        // $dt =  getStrYearMonth();
-        $user_id = Auth::id();  //Get user's id
-        $tasks = DB::table('tasks')->get();
-
-        $date = array();
-        foreach ($tasks as $task) {
-            $date[ strval($task->id) ] = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
-        }
-        $punchIn = array();
-        foreach ($tasks as $task) {
-            $punchIn[ strval($task->id) ] = Carbon::parse($task->punchIn)->format('m/d  H:i');
-        }
-        $punchOut = array();
-        foreach ($tasks as $task) {
-            if($task->punchOut === null) {
-                $punchOut[ strval($task->id) ] = "";
-            } else {
-                $punchOut[ strval($task->id) ] = Carbon::parse($task->punchOut)->format('m/d H:i');
-            }
-        }
-        return view('records.index', compact('user_id', 'dt', 'tasks', 'date', 'punchIn', 'punchOut'));
-    }
-
-    public function show($id)
-    {
-        $task = Task::findOrFail($id);
-        $date = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
-        unset($task['_token']);
-        return view('records.show', compact('task', 'date'));
-        // ->with('task', $task);
-    }
 
     public function create() //create page of punchIn & punchOut
     {
@@ -107,6 +73,47 @@ class RecordController extends Controller
         return redirect('/');
     }
 
+    public function index(Request $request) // here is top page
+    {
+        $dt = Carbon::now()->format("Y年m月の記録");
+        // $dt =  getStrYearMonth();
+        $user_id = Auth::id();  //Get user's id
+        $tasks = DB::table('tasks')->get();
+
+        $date = array();
+        foreach ($tasks as $task) {
+            $date[ strval($task->id) ] = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
+        }
+        $punchIn = array();
+        foreach ($tasks as $task) {
+            $punchIn[ strval($task->id) ] = Carbon::parse($task->punchIn)->format('m/d  H:i');
+        }
+        $punchOut = array();
+        foreach ($tasks as $task) {
+            if($task->punchOut === null) {
+                $punchOut[ strval($task->id) ] = "";
+            } else {
+                $punchOut[ strval($task->id) ] = Carbon::parse($task->punchOut)->format('m/d H:i');
+            }
+        }
+
+        $sumWorkTime = array();
+        foreach ($tasks as $task) {
+            $sumWorkTime += $task->workTime;
+        }
+
+        return view('records.index', compact('user_id', 'dt', 'tasks', 'date', 'punchIn', 'punchOut', 'sumWorkTime'));
+    }
+
+    public function show($id)
+    {
+        $task = Task::findOrFail($id);
+        $date = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
+        unset($task['_token']);
+        return view('records.show', compact('task', 'date'));
+        // ->with('task', $task);
+    }
+
     public function edit($id)
     {
         $task = Task::findOrFail($id);
@@ -126,17 +133,13 @@ class RecordController extends Controller
         return redirect('/');
     }
 
+    public function delete($id)
+    {
+        $task = Task::find($id);
+        $task->delete();
+        return redirect('/');
+    }
 
-
-
-    // public function update(Request $request, $id)
-    // {
-    //     //
-    // }
-    // public function destroy($id)
-    // {
-    //     //
-    // }
     //  method to caluculate how many hours I worked
     public function diffTime($punchIn, $punchOut) //ここでの引数はテーブルとの接続をとりあえず意識せずともOK
     {

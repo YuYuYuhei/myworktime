@@ -13,17 +13,19 @@ Route::get('/', function () {
     return view('auth.login');
 });
 
-// Route::post('/records/create', 'RecordController@create')->middleware('auth');
 
-Route::get('/', 'RecordController@index')->middleware('auth');
-Route::get('/records/{id}', 'RecordController@show')->middleware('auth');
 Route::get('records/create', 'RecordController@create')->middleware('auth');
 Route::post('/punchIn', 'RecordController@storePunchIn')->middleware('auth');
 Route::post('/punchOut', 'RecordController@storePunchOut')->middleware('auth');
 Route::post('/store', 'RecordController@storeMemo')->middleware('auth');
+Route::get('/', 'RecordController@index')->middleware('auth');
+Route::get('/records/{id}', 'RecordController@show')->middleware('auth');
 Route::get('records/edit/{id}', 'RecordController@edit')->middleware('auth');
 Route::post('records/edit/{id}', 'RecordController@update')->middleware('auth');
+Route::delete('delete/{id}', 'RecordController@delete')->middleware('auth');
 
+ // ※createとshowの順番大事。
+ // showが先だと,showメソッドにcreateという文字列が渡されてしまう
 
 
 

@@ -31,6 +31,9 @@ body {
     float: right;
 }
 
+.index-btn {
+    display:inline;
+}
 
 /* index.blade.php */
 
