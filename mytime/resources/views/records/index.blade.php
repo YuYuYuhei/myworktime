@@ -43,9 +43,11 @@
                                     <input type="submit"  value="削除" class="btn btn-danger btn-sm del">
                                 </form>
                              </th>
-                            <td>{{ $punchIn[ strval($task->id) ] }}</td>
-                            <td>{{ $punchOut[ strval($task->id) ] }}</td>
-                            <td>{{ $task->workTime }}</td>
+                            <td>{{ $task->punchIn }}</td>
+                            <td>{{ $task->punchOut }}</td>
+                            <!-- $punchOut[ strval($task->id) ] -->
+                            <td>{{ $workTimeInt }}</td>
+                            <!-- $task->workTimeInt -->
                             <td>{{ $task->memo }}</td>
                             <!-- For memo, I gonna show only 5 letters from beginning -->
                         </tr>
@@ -62,8 +64,8 @@
                     <th scope="col">稼働時間</th>
                 </thead>
                 <tbody>
-                        <!-- <td>◯日</td> -->
-                        <td>{{ $sumWorkTime }}</td>
+                        <td>◯日</td>
+                        <td>{{ $sumWorkTimeInt }}</td>
                 </tbody>
             </table>
         </section>

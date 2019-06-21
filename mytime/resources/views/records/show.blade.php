@@ -27,8 +27,8 @@
             </div>
             <div class="form-group row">
                 <label class="col-md-3">勤務時間</label>
-                @if ( !empty( $task->workTime ))
-                    <p>{{ $task->workTime }}</p>
+                @if ( !empty( $task->workTimeInt ))
+                    <p>{{ $task->workTimeInt }}</p>
                 @else
                     <p></p>
                 @endif

@@ -8,8 +8,17 @@ class Task extends Model
 {
 
     protected $fillable = [
-        'user_id', 'punchIn', 'punchOut', 'memo',
+        'user_id',
+        'punchIn',
+        'punchOut',
+        'memo',
     ];
+
+    // protected $dates = [
+    //     'punchIn',
+    //     'punchOut',
+    //     'workTimeInt',
+    // ];
 
     public function users() {
         return $this->belongsTo(User::class);

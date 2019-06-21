@@ -16,15 +16,17 @@
             <div class="form-group row">
                 <label class="col-md-3">出勤時間</label>
                 <p>{{ $punchInTime }}</p>
+                <!-- $punchInTime -->
             </div>
             <div class="form-group row">
                 <label class="col-md-3">退勤時間</label>
                 <p> {{ $punchOutTime }} </p>
+                <!-- $punchOutTime -->
             </div>
             <div class="form-group row">
                 <label class="col-md-3">勤務時間</label>
                 @if ((!empty($punchInTime))  && (!empty($punchOutTime)))
-                    <p> {{ $workTime  }} </p>
+                    <p> {{ $workTimeInt  }} </p>
                 @else
                     <p></p>
                 @endif
