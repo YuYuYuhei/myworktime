@@ -16,8 +16,10 @@ class Task extends Model
 
     // protected $dates = [
     //     'punchIn',
-    //     'punchOut',
-    //     'workTimeInt',
+    // ];
+
+    // protected $casts = [
+    //     'punchIn' => 'datetime',
     // ];
 
     public function users() {

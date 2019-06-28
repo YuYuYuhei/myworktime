@@ -27,47 +27,48 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($tasks as $task)
-                        <!-- if ($task->punchIn  == $dt) -->
-                        <tr>
-                            <th scope="row">
-                                <a href="{{ url('records', $task->id) }}">{{ $date[ strval($task->id) ] }}</a>
-                                <br />
-                                <!-- <a href=" action('RecordController@edit', $task->id)  "> [編集]</a> -->
-                                <form action="{{ action('RecordController@edit', $task->id) }}" method="get" class="index-btn">
-                                    <input type="submit"  value="編集" class="btn btn-primary btn-sm">
-                                </form>
-                                <form action="{{ action('RecordController@delete', $task->id) }}" method="post" class="index-btn">
-                                    {{ csrf_field() }}
-                                    {{ method_field('delete') }}
-                                    <input type="submit"  value="削除" class="btn btn-danger btn-sm del">
-                                </form>
-                             </th>
-                            <td>{{ $task->punchIn }}</td>
-                            <td>{{ $task->punchOut }}</td>
-                            <!-- $punchOut[ strval($task->id) ] -->
-                            <td>{{ $workTimeInt }}</td>
-                            <!-- $task->workTimeInt -->
-                            <td>{{ $task->memo }}</td>
-                            <!-- For memo, I gonna show only 5 letters from beginning -->
-                        </tr>
-                        <!-- endif -->
-                    @empty
-                        <p>まだ記録はありません。</p>
-                    @endforelse
+                        @forelse ($tasks as $task)
+                            <!-- if ($date2[ strval($task->id) ]  === date('Y-m')) -->
+                                <tr>
+                                    <th scope="row">
+                                        <a href="{{ url('records', $task->id) }}">{{ $date[ strval($task->id) ] }}</a>
+                                        <br />
+                                        <form action="{{ action('RecordController@edit', $task->id) }}" method="get" class="index-btn">
+                                            <input type="submit"  value="編集" class="btn btn-primary btn-sm">
+                                        </form>
+                                        <form action="{{ action('RecordController@delete', $task->id) }}" method="post" class="index-btn">
+                                            {{ csrf_field() }}
+                                            {{ method_field('delete') }}
+                                            <input type="submit"  value="削除" class="btn btn-danger btn-sm del">
+                                        </form>
+                                     </th>
+                                    <td>{{ $task->punchIn }}</td>
+                                    <td>{{ $task->punchOut }}</td>
+                                    <td>{{ $task->workTimeInt }}</td>
+                                    <td>{{ $task->memo }}</td>
+                                    <!-- <td> $date2[ strval($task->id) ]  </td> -->
+                                    <!-- For memo, I gonna show only 5 letters from beginning -->
+                                </tr>
+                            <!-- endif     -->
+                            @empty
+                                <p>まだ記録はありません。</p>
+                        @endforelse
                 </tbody>
             </table>
 
             <table class="table">
                 <thead>
-                    <th scope="col">稼働日数</th>
-                    <th scope="col">稼働時間</th>
+                    <th scope="col">今月の稼働日数</th>
+                    <th scope="col">今月の稼働時間</th>
                 </thead>
                 <tbody>
-                        <td>◯日</td>
-                        <td>{{ $sumWorkTimeInt }}</td>
+                        <td>{{ count($dayOfWork) }}日</td>
+                        <td>{{ gmdate('H時間i分', $sumWorkTimeInt) }}</td>
                 </tbody>
             </table>
+            <!-- <table>
+                <td> $thisMonthdate </td>
+            </table> -->
         </section>
         @section('script')
         <script> //show confirm window when push "削除" ←nothing understand now(6/16)

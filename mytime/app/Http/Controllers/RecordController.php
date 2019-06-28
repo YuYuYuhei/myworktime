@@ -60,44 +60,34 @@ class RecordController extends Controller
         $tasks->save();
         return redirect('/');
     }
+
     public function index(Request $request) // here is top page
     {
-        $dt = Carbon::now()->format("Y年m月の記録");
+        $dt = Carbon::now()->format("今月の記録(Y年m月)");
         // $dt =  getStrYearMonth();
         $user_id = Auth::id();  //Get user's id
-        $tasks = DB::table('tasks')->get();
+        // $tasks = DB::table('tasks')->get();
+        $year = date('Y');//今日の年
+        $month = date('m'); //今日の月
+        $tasks = DB::table('tasks')
+              ->whereYear('punchIn', '=', $year)
+              ->whereMonth('punchIn', '=', $month)
+              ->get();
+        // $tasks = DB::table('tasks')->get();
 
         $date = array();
+        $sumWorkTimeInt = 0;
         foreach ($tasks as $task) {
             $date[ strval($task->id) ] = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
+            $date2[ strval($task->id) ] = Carbon::parse($task->punchIn)->format('Y-m');
+            $task ->workTimeInt  = $this->workTimeDisplay($task->workTimeInt);
         }
-
-        $workTimeInt = $this->workTimeDisplay($task->workTimeInt);
-
-        // foreach ($tasks as $task) {
-        //     $diff = $this->diffTime($task->punchIn, $task->punchOut);
-        // }
-
-        // $punchIn = array();
-        // foreach ($tasks as $task) {
-        //     $punchIn[ strval($task->id) ] = Carbon::parse($task->punchIn)->format('m/d  H:i');
-        // }
-        // $punchOut = array();
-        // foreach ($tasks as $task) {
-        //     if($task->punchOut === null) {
-        //         $punchOut[ strval($task->id) ] = "";
-        //     } else {
-        //         $punchOut[ strval($task->id) ] = Carbon::parse($task->punchOut)->format('m/d H:i');
-        //     }
-        // }
-        // $punchIn = array();
-        // foreach ($tasks as $task) {
-        //     $workTime[ strval($task->id) ] = Carbon::parse($task->punchIn)->format('m/d  H:i');
-        // }
+        $dayOfWork = array_unique($date); //array_uniqueで重複を削除し日数を計算！
         $sumWorkTimeInt = DB::table('tasks')->sum('workTimeInt'); // 実働時間合計
 
-        return view('records.index', compact('user_id', 'dt', 'tasks', 'date', 'diff','punchIn', 'punchOut', 'workTimeInt', 'sumWorkTimeInt'));
+        return view('records.index', compact('dt', 'tasks', 'year', 'month', 'date', 'date2', 'sumWorkTimeInt', 'dayOfWork'));
     }
+
     public function show($id)
     {
         $task = Task::findOrFail($id);
@@ -145,17 +135,49 @@ class RecordController extends Controller
 
     public function workTimeDisplay($workTimeInt)
     {
-        // $tasks = DB::table('tasks')->get();
         return gmdate('H:i', $workTimeInt);
     }
 
-    public function AAAA($workTime, $workTimeInt)
+    public function thisMonth()
     {
-        $user_id = Auth::id();  //Get user's id
-        $workTime = DB::table('tasks')->sum('workTimeInt');
-        $workTimeInt = strtotime($workTime);
-        return gmdate('H:i', $workTimeInt);
+        $t = '2019-06';
+        $thisMonth = new DateTime($t);
+        $yearMonth = $thisMonth->format('Y m');
     }
 
 
 }
+
+
+// 元indexの中身
+// foreach($tasks as $task) {
+//     $task ->workTimeInt  = $this->workTimeDisplay($task->workTimeInt);
+// }
+// foreach($tasks as &$task)
+
+// foreach ($tasks as $task) {
+//     $diff = $this->diffTime($task->punchIn, $task->punchOut);
+// }
+
+// $punchIn = array();
+// foreach ($tasks as $task) {
+//     $punchIn[ strval($task->id) ] = Carbon::parse($task->punchIn)->format('m/d  H:i');
+// }
+// $punchOut = array();
+// foreach ($tasks as $task) {
+//     if($task->punchOut === null) {
+//         $punchOut[ strval($task->id) ] = "";
+//     } else {
+//         $punchOut[ strval($task->id) ] = Carbon::parse($task->punchOut)->format('m/d H:i');
+//     }
+// }
+// $punchIn = array();
+// foreach ($tasks as $task) {
+//     $workTime[ strval($task->id) ] = Carbon::parse($task->punchIn)->format('m/d  H:i');
+// }
+// $dayOfWork = DB::table('tasks')->count('punchIn'); // 稼働日集計
+
+
+ // $dayOfWork = array_unique($tempDayOfWork);
+
+// $dayOfWork = DB::table('tasks')->select('punchIn')->distinct()->count('%m-%d'); // 稼働日集計
