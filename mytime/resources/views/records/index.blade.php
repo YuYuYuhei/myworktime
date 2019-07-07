@@ -51,7 +51,7 @@
                                             <td>{{ $task->punchIn }}</td>
                                             <td>{{ $task->punchOut }}</td>
                                             <td>{{ $task->workTimeInt }}</td>
-                                            <td>{{ $task->memo }}</td>
+                                            <td>{{ str_limit($task->memo, 20) }}</td>
 
                                             <!-- <td> $date2[ strval($task->id) ]  </td> -->
                                             <!-- For memo, I gonna show only 5 letters from beginning -->

@@ -28,14 +28,19 @@
                     <ul class="navbar-nav ml-auto">
                         <!-- Authentication Links -->
                         @guest
-                        <li><a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a></li>
+                        <li><a class="nav-link" href="{{ route('login') }}">{{ __('messages.Login') }}</a></li>
                         @if (Route::has('register'))
-                        <li class="nav-item"><a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('register') }}">{{ __('messages.Register') }}</a>
                         </li>
                         @endif
                         @else
                         <!-- ログアウト機能が不全になった時のログアウト記述 -->
                         <!--<li><a class="nav-link" href="{{ route('logout') }}">{{ __('Logout') }}</a></li>-->
+                        <div aria-labelledby="navbarDropdown">
+                            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                 {{ Auth::user()->name }} <span class="caret"></span>
+                             </a>
+                        </div>
                         <div aria-labelledby="navbarDropdown">
                             <a class="nav-link" href="{{ route('logout') }}"
                             onclick="event.preventDefault();
