@@ -41,18 +41,29 @@ body {
     margin-top: 40px;
 }
 
+.my-records  h1 {
+    display: flex;
+    /* align-items: center; */
+    justify-content: space-between;
+}
+
 .my-records  h1 > a {
     text-decoration: none;
     font-size: 17px
 }
 
-.prev-month {
-    float: left;
+.disp {
+    display: inline-flex;
+    flex-flow: column wrap;
+    padding-top: 60px;
 }
 
-.next-month {
-    float: right;
+.disp-month {
+    margin-left: 30px;
+    font-size: 16px;
+    flex-basis:5px;
 }
+
 
 /* show.blade.php */
 

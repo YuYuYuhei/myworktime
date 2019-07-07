@@ -33,7 +33,7 @@
                     <div class="form-group row">
                         <label class="col-md-3">勤務時間</label>
                         @if ( !empty( $task->workTimeInt ))
-                            <p>{{ $task->workTimeInt }}</p>
+                            <p>{{ gmdate('H:i', $workTimeInt) }}</p>
                         @else
                             <p></p>
                         @endif

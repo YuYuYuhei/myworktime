@@ -26,7 +26,7 @@
             <div class="form-group row">
                 <label class="col-md-3">勤務時間</label>
                 @if ((!empty($punchInTime))  && (!empty($punchOutTime)))
-                    <p> {{ $workTimeInt  }} </p>
+                    <p> {{ gmdate('H時間i分', $workTimeInt) }} </p>
                 @else
                     <p></p>
                 @endif

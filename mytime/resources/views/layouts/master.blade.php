@@ -24,10 +24,6 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div id="menu" class="collapse navbar-collapse">
-                    <ul class="navbar-nav mr-auto">
-                        <li class="nav-item"><a href="" class="nav-link">ホーム</a></li>
-                        <li class="nav-item"><a href="" class="nav-link">新規作成</a></li>
-                    </ul>
                     <!-- ナビバー右側 -->
                     <ul class="navbar-nav ml-auto">
                         <!-- Authentication Links -->
