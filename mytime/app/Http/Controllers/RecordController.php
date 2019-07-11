@@ -7,16 +7,17 @@ use App\User;
 use App\Task;
 use Carbon\Carbon;
 use DateTime;
+
 class RecordController extends Controller
 {
     public function create() //create page of punchIn & punchOut
     {
         $dt = Carbon::now()->format("Y年m月d日の記録");
-        $user_id = Auth::id();  //Get user's id
         $punchInTime = "";
         $punchOutTime = "";
-        return view('records.create' , compact('user_id', 'punchInTime', 'punchOutTime', 'dt'));
+        return view('records.create' , compact('dt', 'punchInTime', 'punchOutTime'));
     }
+
     public function storePunchIn(Request $request) // store punchIn data from create page
     {
         $dt = Carbon::now()->format("Y年m月d日の記録");
@@ -25,34 +26,40 @@ class RecordController extends Controller
             'user_id' => $user_id,
             'punchIn' => Carbon::now(),
         ]);
-        $tasks = Task::where('user_id', $user_id)->latest()->first();
+        $tasks = Task::where('user_id', $user_id)
+                         ->latest()
+                         ->first();
         $punchInTime = $tasks->punchIn;
         $punchOutTime = $tasks->punchOut;
         $diff = "";
-        return view('records.create',
-                       compact('dt', 'user_id', 'punchIn', '$tasks', 'punchInTime', 'punchOutTime', 'diff'));
+        return view('records.create', compact('dt', 'punchInTime', 'punchOutTime'));
     }
+
     public function storePunchOut(Request $request) // store punchOut data from create page
     {
         $dt = Carbon::now()->format("Y年m月d日の記録");
         $user_id = Auth::id();  //Get user's id
-        $tasks = Task::where('user_id', $user_id)->latest()->first();
+        $tasks = Task::where('user_id', $user_id)
+                        ->latest()
+                        ->first();
         $tasks->punchOut = Carbon::now();
         $diff = $this->diffTime($tasks->punchIn, $tasks->punchOut);
         $tasks->workTimeInt = $diff;
         $tasks->save();
         $punchInTime = $tasks->punchIn;
         $punchOutTime = $tasks->punchOut;
-        $memo = $tasks->memo;
         $workTimeInt = $tasks->workTimeInt;
         return view('records.create',
-                       compact('dt', 'user_id', 'tasks', '$punchOut', 'punchInTime', 'punchOutTime', 'memo', 'diff', 'workTimeInt'));
+                      compact('dt', 'punchInTime', 'punchOutTime', 'workTimeInt'));
     }
+
     public function storeMemo(Request $request) // store Memo
     {
         $dt = Carbon::now()->format("Y年m月d日の記録");
         $user_id = Auth::id();  //Get user's id
-        $tasks = Task::where('user_id', $user_id)->latest()->first();
+        $tasks = Task::where('user_id', $user_id)
+                        ->latest()
+                        ->first();
         $tasks->memo = $request->memo;
         //動的にデータを処理している..はず
         // Task::update([ memo=... ])はstatic的な方法なのでここではエラーになる
@@ -64,21 +71,17 @@ class RecordController extends Controller
 
     public function index(Request $request) // here is top page
     {
+        $user_id = Auth::id();
         if((isset($request->year)) && (isset($request->month)))
         {
             $year = $request->year;
             $month = $request->month;
-            // \Debugbar::info('if');
-            // \Debugbar::info($year);
-            // \Debugbar::info($month);
         } else {
             $year = Carbon::now()->format('Y');//今日の年
             $month = Carbon::now()->format('m'); //今日の月
         }
 
         $dt = "今月の記録(".$year."年".$month."月)";
-        $user_id = Auth::id();  //Get user's id
-        $form = $request->all();
 
         $date = (new Carbon($year."-".$month))->subMonth();
         $prevYear = $date->format('Y'); //前の年
@@ -92,12 +95,10 @@ class RecordController extends Controller
         $y = $date->format('Y');
         $m = $date->format('m');
 
-
-        // $tasks = DB::table('tasks')->get();
-        $tasks = DB::table('tasks')
-              ->whereYear('punchIn', '=', $year)
-              ->whereMonth('punchIn', '=', $month)
-              ->get();
+        $tasks = Task::where('user_id', $user_id)
+                          ->whereYear('punchIn', '=', $year)
+                          ->whereMonth('punchIn', '=', $month)
+                          ->get();
 
         $date = array();
         $sumWorkTimeInt = 0;
@@ -107,12 +108,13 @@ class RecordController extends Controller
             $task ->workTimeInt  = $this->workTimeDisplay($task->workTimeInt);
         }
         $dayOfWork = array_unique($date); //array_uniqueで重複を削除し日数を計算！
-        $sumWorkTimeInt = DB::table('tasks')
+        $sumWorkTimeInt = Task::where('user_id', $user_id)
                                 ->whereYear('punchIn', '=', $year)
                                 ->whereMonth('punchIn', '=', $month)
                                 ->sum('workTimeInt'); // 該当月の実働時間合計
 
-        $links = DB::table('tasks')->get();
+        $links = Task::where('user_id', $user_id)
+                 ->get();
         foreach($links as $link)
         {
             $temp = Carbon::parse($link->punchIn)->format('Y-m'); //データベースのpunchinをforeachで回しY-mで取得
@@ -131,7 +133,8 @@ class RecordController extends Controller
 
          // \Debugbar::info($explodeYearMonths);
 
-         return view('records.index', compact('dt', 'prevYear','prevMonth', 'nextYear', 'nextMonth', 'linkY', 'linkM', 'tasks', 'date', 'sumWorkTimeInt', 'dayOfWork', 'linkYearMonths', 'explodeYearMonths'));
+         return view('records.index',
+                         compact('dt', 'prevYear','prevMonth', 'nextYear', 'nextMonth', 'tasks', 'date', 'sumWorkTimeInt', 'dayOfWork', 'linkYearMonths', 'explodeYearMonths'));
     }
 
     public function show($id)
@@ -150,6 +153,7 @@ class RecordController extends Controller
         $workTimeInt = $task->workTimeInt;
         return view('records.edit', compact('task', 'date', 'workTimeInt'));
     }
+    
     public function update(Request $request, $id)
     {
         $task = Task::findOrFail($id);
@@ -162,14 +166,13 @@ class RecordController extends Controller
 
         return redirect('/');
     }
+
     public function delete($id)
     {
         $task = Task::find($id);
         $task->delete();
         return redirect('/');
     }
-
-
 
     //  method to caluculate how many hours I worked
     public function diffTime($punchIn, $punchOut) //ここでの引数はテーブルとの接続をとりあえず意識せずともOK

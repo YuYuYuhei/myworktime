@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Task extends Model
 {
 
+    protected $table = 'tasks';
+
     protected $fillable = [
         'user_id',
         'punchIn',
@@ -14,14 +16,10 @@ class Task extends Model
         'memo',
     ];
 
-    // protected $dates = [
-    //     'punchIn',
-    // ];
 
-    // protected $casts = [
-    //     'punchIn' => 'datetime',
-    // ];
-
+    // public function users() {
+    //     return $this->belongsTo('users');
+    // }
     public function users() {
         return $this->belongsTo(User::class);
     }
