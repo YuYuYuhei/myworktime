@@ -26,9 +26,15 @@
                 @endif
             </div>
             <div class="form-group row">
+                <label class="col-md-3">休憩時間</label>
+                <p>{{ $breakTime }} </p>
+                <!-- <p> $breakTimeInt  </p> -->
+            </div>
+            <div class="form-group row">
                 <label class="col-md-3">勤務時間</label>
                 @if ( !empty( $task->workTimeInt ))
-                    <p>{{ gmdate('H:i', $workTimeInt) }}</p>
+                    <p>{{ $workTime }}</p>
+                    <!-- <p> gmdate('H時間i分', $workTimeInt) </p> -->
                 @else
                     <p></p>
                 @endif

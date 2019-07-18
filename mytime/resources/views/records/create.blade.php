@@ -16,17 +16,18 @@
             <div class="form-group row">
                 <label class="col-md-3">出勤時間</label>
                 <p>{{ $punchInTime }}</p>
-                <!-- $punchInTime -->
             </div>
             <div class="form-group row">
                 <label class="col-md-3">退勤時間</label>
                 <p> {{ $punchOutTime }} </p>
-                <!-- $punchOutTime -->
             </div>
             <div class="form-group row">
                 <label class="col-md-3">勤務時間</label>
                 @if ((!empty($punchInTime))  && (!empty($punchOutTime)))
-                    <p> {{ gmdate('H時間i分', $workTimeInt) }} </p>
+                    <!-- <p>  gmdate('H時間i分', $workTimeInt)  <br> -->
+                    <p> {{ gmdate('H時間i分', $diff) }} <br>
+                        ※休憩時間の設定は下部でおこなってください。
+                    </p>
                 @else
                     <p></p>
                 @endif
@@ -48,13 +49,26 @@
             @if ((!empty($punchInTime)) && (!empty($punchOutTime)) )
                 <form action=" {{ url('/store' ) }}" method="post" enctype="multipart/form-data"> <!--☆ -->
                     {{ csrf_field() }}
+                        <!-- <div class="form-group row">
+                            <label class="col-md-3" for="breakTime">休憩時間</label>
+                            <input type="time" name="breakTime" value="01:00">
+                            <p>time</p>
+                        </div> -->
+                        <div class="form-group row">
+                            <label class="col-md-3" for="breakIn">休憩入り時間</label>
+                            <input type="datetime" name="breakIn" value="{{ $punchInTime }}">
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-3" for="breakOut">休憩戻り時間</label>
+                            <input type="datetime" name="breakOut"  value="{{ $punchOutTime }}">
+                        </div>
                         <div class="form-group row">
                             <label class="col-md-3" for="memo">メモ(備忘録)</label>
                             <div class="col-md-10">
                                 <textarea class="form-control" name="memo" rows="8" >{{ old('memo') }}</textarea>
                             </div>
                         </div>
-                    <input type="submit" class="btn btn-info btn-sm active mt-3" value="メモを保存する">
+                    <input type="submit" class="btn btn-info btn-sm active mt-3" value="休憩時間とメモを保存する">
                 </form>
             @endif
         </section>

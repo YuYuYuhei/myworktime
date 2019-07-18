@@ -31,12 +31,28 @@
                         @endif
                     </div>
                     <div class="form-group row">
+                        <label class="col-md-3">休憩時間</label>
+                        @if ( !empty( $task->breakTimeInt ))
+                        <p>{{ $breakTime }}</p>
+                        @else
+                        <p></p>
+                        @endif
+                    </div>
+                    <div class="form-group row">
                         <label class="col-md-3">勤務時間</label>
                         @if ( !empty( $task->workTimeInt ))
-                            <p>{{ gmdate('H:i', $workTimeInt) }}</p>
+                            <p>{{ $workTime }}</p>
                         @else
                             <p></p>
                         @endif
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3" for="breakIn">休憩入り時間</label>
+                        <input type="datetime" name="breakIn" value="{{ $task->breakIn }}">
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3" for="breakOut">休憩戻り時間</label>
+                        <input type="datetime" name="breakOut"  value="{{ $task->breakOut }}">
                     </div>
                     <div class="form-group row">
                         <label class="col-md-3" for="memo">メモ(備忘録)</label>

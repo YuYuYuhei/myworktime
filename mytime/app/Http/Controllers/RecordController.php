@@ -27,8 +27,8 @@ class RecordController extends Controller
             'punchIn' => Carbon::now(),
         ]);
         $tasks = Task::where('user_id', $user_id)
-                         ->latest()
-                         ->first();
+                       ->latest()
+                       ->first();
         $punchInTime = $tasks->punchIn;
         $punchOutTime = $tasks->punchOut;
         $diff = "";
@@ -43,14 +43,14 @@ class RecordController extends Controller
                         ->latest()
                         ->first();
         $tasks->punchOut = Carbon::now();
-        $diff = $this->diffTime($tasks->punchIn, $tasks->punchOut);
-        $tasks->workTimeInt = $diff;
+        $diff = $this->diffTime($tasks->punchIn, $tasks->punchOut); //aaaa
+        // $tasks->workTimeInt = $diff;
         $tasks->save();
         $punchInTime = $tasks->punchIn;
         $punchOutTime = $tasks->punchOut;
-        $workTimeInt = $tasks->workTimeInt;
+        // $workTimeInt = $tasks->workTimeInt;
         return view('records.create',
-                      compact('dt', 'punchInTime', 'punchOutTime', 'workTimeInt'));
+                      compact('dt', 'diff', 'punchInTime', 'punchOutTime', 'workTimeInt'));
     }
 
     public function storeMemo(Request $request) // store Memo
@@ -60,11 +60,19 @@ class RecordController extends Controller
         $tasks = Task::where('user_id', $user_id)
                         ->latest()
                         ->first();
+        $punchInTime = $tasks->punchIn;
+        $punchOutTime = $tasks->punchOut;
+        $diff = $this->diffTime($tasks->punchIn, $tasks->punchOut);
+
+        $tasks->breakIn = $request->breakIn;
+        $tasks->breakOut = $request->breakOut;
+        $diffBreak = $this->diffBreakTime($tasks->breakIn, $tasks->breakOut);
+        $tasks->breakTimeInt = $diffBreak;
+        $tasks->workTimeInt = $diff - $diffBreak;
+
         $tasks->memo = $request->memo;
         //動的にデータを処理している..はず
         // Task::update([ memo=... ])はstatic的な方法なのでここではエラーになる
-        $punchInTime = $tasks->punchIn;
-        $punchOutTime = $tasks->punchOut;
         $tasks->save();
         return redirect('/');
     }
@@ -82,15 +90,12 @@ class RecordController extends Controller
         }
 
         $dt = "今月の記録(".$year."年".$month."月)";
-
         $date = (new Carbon($year."-".$month))->subMonth();
         $prevYear = $date->format('Y'); //前の年
         $prevMonth = $date->format('m'); //前の月
-
         $date = (new Carbon($year."-".$month))->addMonth();
         $nextYear = $date->format('Y'); //翌年
         $nextMonth = $date->format('m'); //翌月
-
         $date = new Carbon($year."-".$month);
         $y = $date->format('Y');
         $m = $date->format('m');
@@ -99,19 +104,27 @@ class RecordController extends Controller
                           ->whereYear('punchIn', '=', $year)
                           ->whereMonth('punchIn', '=', $month)
                           ->get();
-
         $date = array();
         $sumWorkTimeInt = 0;
         foreach ($tasks as $task) {
             $date[ strval($task->id) ] = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
             $date2[ strval($task->id) ] = Carbon::parse($task->punchIn)->format('Y/m');
-            $task ->workTimeInt  = $this->workTimeDisplay($task->workTimeInt);
+            $task->punchIn = Carbon::parse($task->punchIn)->format('Y/m/d H:i');
+            $task->punchOut = Carbon::parse($task->punchOut)->format('Y/m/d H:i');
+            if (isset($task->breakTimeInt))
+            {
+                $task->breakTimeInt = Carbon::parse($task->breakTimeInt)->format('H:i');
+            }
+            $task->workTimeInt  = $this->workTimeDisplay($task->workTimeInt);
         }
+
         $dayOfWork = array_unique($date); //array_uniqueで重複を削除し日数を計算！
         $sumWorkTimeInt = Task::where('user_id', $user_id)
                                 ->whereYear('punchIn', '=', $year)
                                 ->whereMonth('punchIn', '=', $month)
                                 ->sum('workTimeInt'); // 該当月の実働時間合計
+
+
 
         $links = Task::where('user_id', $user_id)
                  ->get();
@@ -122,7 +135,6 @@ class RecordController extends Controller
             // $strYearMonth = string date('Y-m', $temp);
             // \Debugbar::info($link->punchIn);
         }
-
          $linkYearMonths = array_unique($yearMonth); //データの重複をarray_uniqueで排除
          rsort($linkYearMonths); //並び替え
          // list($year, $month) = preg_split('/[-]/', $linkYearMonths);
@@ -130,40 +142,52 @@ class RecordController extends Controller
          {
              $explodeYearMonths[] = explode("-", $linkYearMonth); //年月をexplodeで分割し配列に入れる
          }
-
          // \Debugbar::info($explodeYearMonths);
-
          return view('records.index',
                          compact('dt', 'prevYear','prevMonth', 'nextYear', 'nextMonth', 'tasks', 'date', 'sumWorkTimeInt', 'dayOfWork', 'linkYearMonths', 'explodeYearMonths'));
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $task = Task::findOrFail($id);
         $date = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
-        $workTimeInt = $task->workTimeInt;
+        $task->punchIn = Carbon::parse($task->punchIn)->format('Y/m/d H時i分');
+        $task->punchOut = Carbon::parse($task->punchOut)->format('Y/m/d H時i分');
+        $breakTime = Carbon::parse($task->breakTimeInt)->format('H時間i分');
+        $workTime = Carbon::parse($task->workTimeInt)->format('H時間i分');
+
         unset($task['_token']);
-        return view('records.show', compact('task', 'date', 'workTimeInt'));
-        // ->with('task', $task);
+        return view('records.show', compact('task', 'date', 'breakTime', 'workTime'));
     }
+
     public function edit($id)
     {
         $task = Task::findOrFail($id);
         $date = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
-        $workTimeInt = $task->workTimeInt;
-        return view('records.edit', compact('task', 'date', 'workTimeInt'));
+        $breakTime = Carbon::parse($task->breakTimeInt)->format('H時間i分');
+        $workTime = Carbon::parse($task->workTimeInt)->format('H時間i分');
+        return view('records.edit', compact('task', 'date', 'breakTime', 'workTime'));
     }
-    
+
     public function update(Request $request, $id)
     {
         $task = Task::findOrFail($id);
+
         $date = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
         $task->punchIn = $request->punchIn;
         $task->punchOut = $request->punchOut;
+        $task->breakIn = $request->breakIn;
+        $task->breakOut = $request->breakOut;
         $task->memo = $request->memo;
-        $task->workTimeInt = $this->diffTime($task->punchIn, $task->punchOut);
-        $task->save();
 
+        $diff = $this->diffTime($task->punchIn, $task->punchOut);
+        $diffBreak = $this->diffBreakTime($task->breakIn, $task->breakOut);
+
+        $task->breakTimeInt = $diffBreak;
+        $task->workTimeInt = $diff - $diffBreak;
+
+        // $task->workTimeInt = $this->diffBreakTime($task->punchIn, $task->punchOut, $task->breakTime);
+        $task->save();
         return redirect('/');
     }
 
@@ -179,9 +203,22 @@ class RecordController extends Controller
     {
         $start = strtotime($punchIn); //strtotime→これで数値化することによって計算できる
         $end = strtotime($punchOut); //この関数を$start,$endなどと代入してやらないといけない
-        return  $end- $start;
+        return  $end - $start;
         // return gmdate('h:i', $diff); //この計算式を適用したいAction内で使う
-        // return gmdate('H:i', $diff); //この計算式を適用したいAction内で使う
+    }
+
+    public function diffBreakTime($breakIn, $breakOut)
+    {
+        $breakIn = strtotime($breakIn);
+        $breakOut = strtotime($breakOut);
+        return $breakOut - $breakIn;
+    }
+
+    public function workTimeInt($diff, $breakTimeInt)
+    {
+        $workTime = strtotime($diff);
+        $breakTime = strtotime($breakTimeInt);
+        return  $workTime - $breakTime;
     }
 
     public function workTimeDisplay($workTimeInt)

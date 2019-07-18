@@ -14,6 +14,9 @@ class Task extends Model
         'punchIn',
         'punchOut',
         'memo',
+        'breakTime',
+        'breakTimeInt',
+        'breakDateTime',
     ];
 
 

@@ -28,6 +28,7 @@
                                 <th scope="col">日付</th>
                                 <th scope="col">出勤</th>
                                 <th scope="col">退勤</th>
+                                <th scope="col">休憩</th>
                                 <th scope="col">実働</th>
                                 <th scope="col">メモ</th>
                             </tr>
@@ -50,10 +51,9 @@
                                              </th>
                                             <td>{{ $task->punchIn }}</td>
                                             <td>{{ $task->punchOut }}</td>
+                                            <td>{{ $task->breakTimeInt }}</td>
                                             <td>{{ $task->workTimeInt }}</td>
-                                            <td>{{ str_limit($task->memo, 20) }}</td>
-
-                                            <!-- <td> $date2[ strval($task->id) ]  </td> -->
+                                            <td>{{ str_limit($task->memo, 5) }}</td>
                                             <!-- For memo, I gonna show only 5 letters from beginning -->
                                         </tr>
                                     <!-- endif     -->
@@ -70,7 +70,7 @@
                         </thead>
                         <tbody>
                                 <td>{{ count($dayOfWork) }}日</td>
-                                <td>{{ gmdate('H時間i分', $sumWorkTimeInt) }}</td>
+                                <td>{{ gmdate('H時間i分s秒', $sumWorkTimeInt) }}</td>
                                 <!-- 全部の列を計算している -->
                         </tbody>
                     </table>
