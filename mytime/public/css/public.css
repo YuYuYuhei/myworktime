@@ -1,0 +1,79 @@
+body {
+  font-family: Verdana, sans-serif;
+  font-size: 14px;
+}
+
+.container {
+  width: 800px;
+  margin: 20px auto;
+}
+
+.timeBtn li {
+    list-style: none;
+    display: block;
+    float: left;
+}
+
+/* index.blade.php+create.blade.php */
+
+.top-menu {
+    border-bottom: 2px solid #808080;
+    padding-bottom: 5px;
+}
+
+.top-menu h1 {
+    font-size: 20px;
+}
+
+.top-menu a {
+    font-size: 20px;
+    text-decoration: none;
+    float: right;
+}
+
+.index-btn {
+    display:inline;
+}
+
+/* index.blade.php */
+
+.my-records  {
+    margin-top: 40px;
+}
+
+.my-records  h1 {
+    display: flex;
+    /* align-items: center; */
+    justify-content: space-between;
+}
+
+.my-records  h1 > a {
+    text-decoration: none;
+    font-size: 17px
+}
+
+.disp {
+    display: inline-flex;
+    flex-flow: column wrap;
+    padding-top: 60px;
+}
+
+.disp-month {
+    margin-left: 30px;
+    font-size: 16px;
+    flex-basis:5px;
+}
+
+
+/* show.blade.php */
+
+.texts {
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid black;
+}
+
+/* create.blade.php */
+.display-area {
+    margin-top: 50px;
+}
