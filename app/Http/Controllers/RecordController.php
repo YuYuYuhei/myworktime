@@ -226,4 +226,4 @@ class RecordController extends Controller
         return gmdate('H:i', $workTimeInt);
     }
 
-}
+} //aaaaa
