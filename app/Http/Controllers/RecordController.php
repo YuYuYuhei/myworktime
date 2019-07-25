@@ -80,8 +80,9 @@ class RecordController extends Controller
     public function index(Request $request) // here is top page
     {
         $user_id = Auth::id();
-        if(isset($request->punchIn))
-        {
+        // $user = Task::where('punchIn', $user_id)->get();
+        // if(isset($user->punchIn))
+        // {
             if((isset($request->year)) && (isset($request->month)))
             {
                 $year = $request->year;
@@ -144,11 +145,11 @@ class RecordController extends Controller
             {
                 $explodeYearMonths[] = explode("-", $linkYearMonth); //年月をexplodeで分割し配列に入れる
             }
-        } else {
-            $dt = Carbon::now()->format("今日はY年m月d日(D)です。");
-            $user_id = Auth::id();
-            return view('records.index-empty', compact('dt'));
-        }
+        // } else {
+        //     $dt = Carbon::now()->format("今日はY年m月d日(D)です。");
+        //     $user_id = Auth::id();
+        //     return view('records.index-empty', compact('dt'));
+        // }
          // \Debugbar::info($explodeYearMonths);
          return view('records.index',
                          compact('dt', 'prevYear','prevMonth', 'nextYear', 'nextMonth', 'tasks', 'date', 'sumWorkTimeInt', 'dayOfWork', 'linkYearMonths', 'explodeYearMonths'));
