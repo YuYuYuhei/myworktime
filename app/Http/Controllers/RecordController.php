@@ -80,68 +80,75 @@ class RecordController extends Controller
     public function index(Request $request) // here is top page
     {
         $user_id = Auth::id();
-        if((isset($request->year)) && (isset($request->month)))
+        if(isset($request->punchIn))
         {
-            $year = $request->year;
-            $month = $request->month;
-        } else {
-            $year = Carbon::now()->format('Y');//今日の年
-            $month = Carbon::now()->format('m'); //今日の月
-        }
-
-        $dt = "今月の記録(".$year."年".$month."月)";
-        $date = (new Carbon($year."-".$month))->subMonth();
-        $prevYear = $date->format('Y'); //前の年
-        $prevMonth = $date->format('m'); //前の月
-        $date = (new Carbon($year."-".$month))->addMonth();
-        $nextYear = $date->format('Y'); //翌年
-        $nextMonth = $date->format('m'); //翌月
-        $date = new Carbon($year."-".$month);
-        $y = $date->format('Y');
-        $m = $date->format('m');
-
-        $tasks = Task::where('user_id', $user_id)
-                          ->whereYear('punchIn', '=', $year)
-                          ->whereMonth('punchIn', '=', $month)
-                          ->get();
-        $date = array();
-        $sumWorkTimeInt = 0;
-        foreach ($tasks as $task) {
-            $date[ strval($task->id) ] = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
-            $date2[ strval($task->id) ] = Carbon::parse($task->punchIn)->format('Y/m');
-            $task->punchIn = Carbon::parse($task->punchIn)->format('Y/m/d H:i');
-            $task->punchOut = Carbon::parse($task->punchOut)->format('Y/m/d H:i');
-            if (isset($task->breakTimeInt))
+            if((isset($request->year)) && (isset($request->month)))
             {
-                $task->breakTimeInt = Carbon::parse($task->breakTimeInt)->format('H:i');
+                $year = $request->year;
+                $month = $request->month;
+            } else {
+                $year = Carbon::now()->format('Y');//今日の年
+                $month = Carbon::now()->format('m'); //今日の月
             }
-            $task->workTimeInt  = $this->workTimeDisplay($task->workTimeInt);
+
+            $dt = "今月の記録(".$year."年".$month."月)";
+            $date = (new Carbon($year."-".$month))->subMonth();
+            $prevYear = $date->format('Y'); //前の年
+            $prevMonth = $date->format('m'); //前の月
+            $date = (new Carbon($year."-".$month))->addMonth();
+            $nextYear = $date->format('Y'); //翌年
+            $nextMonth = $date->format('m'); //翌月
+            $date = new Carbon($year."-".$month);
+            $y = $date->format('Y');
+            $m = $date->format('m');
+
+            $tasks = Task::where('user_id', $user_id)
+            ->whereYear('punchIn', '=', $year)
+            ->whereMonth('punchIn', '=', $month)
+            ->get();
+            $date = array();
+            $sumWorkTimeInt = 0;
+            foreach ($tasks as $task) {
+                $date[ strval($task->id) ] = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
+                $date2[ strval($task->id) ] = Carbon::parse($task->punchIn)->format('Y/m');
+                $task->punchIn = Carbon::parse($task->punchIn)->format('Y/m/d H:i');
+                $task->punchOut = Carbon::parse($task->punchOut)->format('Y/m/d H:i');
+                if (isset($task->breakTimeInt))
+                {
+                    $task->breakTimeInt = Carbon::parse($task->breakTimeInt)->format('H:i');
+                }
+                $task->workTimeInt  = $this->workTimeDisplay($task->workTimeInt);
+            }
+
+            $dayOfWork = array_unique($date); //array_uniqueで重複を削除し日数を計算！
+            $sumWorkTimeInt = Task::where('user_id', $user_id)
+            ->whereYear('punchIn', '=', $year)
+            ->whereMonth('punchIn', '=', $month)
+            ->sum('workTimeInt'); // 該当月の実働時間合計
+
+            $links = Task::where('user_id', $user_id)
+            ->get();
+            foreach($links as $link)
+            {
+                if(isset($link->punchIn))
+                {
+                    $temp = Carbon::parse($link->punchIn)->format('Y-m'); //データベースのpunchinをforeachで回しY-mで取得
+                }
+                $yearMonth[] = $temp;
+                // \Debugbar::info($link->punchIn);
+            }
+
+            $linkYearMonths = array_unique($yearMonth); //データの重複をarray_uniqueで排除
+            rsort($linkYearMonths); //並び替え
+            foreach($linkYearMonths as $linkYearMonth) //とってきたY-mデータ値を更にforeachで回す
+            {
+                $explodeYearMonths[] = explode("-", $linkYearMonth); //年月をexplodeで分割し配列に入れる
+            }
+        } else {
+            $dt = Carbon::now()->format("今日はY年m月d日(D)です。");
+            $user_id = Auth::id();
+            return view('records.index-empty', compact('dt'));
         }
-
-        $dayOfWork = array_unique($date); //array_uniqueで重複を削除し日数を計算！
-        $sumWorkTimeInt = Task::where('user_id', $user_id)
-                                ->whereYear('punchIn', '=', $year)
-                                ->whereMonth('punchIn', '=', $month)
-                                ->sum('workTimeInt'); // 該当月の実働時間合計
-
-
-
-        $links = Task::where('user_id', $user_id)
-                 ->get();
-        foreach($links as $link)
-        {
-            $temp = Carbon::parse($link->punchIn)->format('Y-m'); //データベースのpunchinをforeachで回しY-mで取得
-            $yearMonth[] = $temp;
-            // $strYearMonth = string date('Y-m', $temp);
-            // \Debugbar::info($link->punchIn);
-        }
-         $linkYearMonths = array_unique($yearMonth); //データの重複をarray_uniqueで排除
-         rsort($linkYearMonths); //並び替え
-         // list($year, $month) = preg_split('/[-]/', $linkYearMonths);
-         foreach($linkYearMonths as $linkYearMonth) //とってきたY-mデータ値を更にforeachで回す
-         {
-             $explodeYearMonths[] = explode("-", $linkYearMonth); //年月をexplodeで分割し配列に入れる
-         }
          // \Debugbar::info($explodeYearMonths);
          return view('records.index',
                          compact('dt', 'prevYear','prevMonth', 'nextYear', 'nextMonth', 'tasks', 'date', 'sumWorkTimeInt', 'dayOfWork', 'linkYearMonths', 'explodeYearMonths'));
