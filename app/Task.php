@@ -14,10 +14,13 @@ class Task extends Model
         'punchIn',
         'punchOut',
         'memo',
-        'breakTime',
+        'breakIn',
+        'breakOut',
         'breakTimeInt',
-        'breakDateTime',
+        'workTimeInt',
     ];
+
+    protected $guarded = ["workingTime"];
 
 
     // public function users() {
