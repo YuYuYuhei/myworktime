@@ -80,9 +80,9 @@ class RecordController extends Controller
     public function index(Request $request) // here is top page
     {
         $user_id = Auth::id();
-        // $user = Task::where('punchIn', $user_id)->get();
-        // if(isset($user->punchIn))
-        // {
+        $user = Task::where('user_id', $user_id)->exists();
+        if($user == true)
+        {
             if((isset($request->year)) && (isset($request->month)))
             {
                 $year = $request->year;
@@ -127,14 +127,13 @@ class RecordController extends Controller
             ->whereMonth('punchIn', '=', $month)
             ->sum('workTimeInt'); // 該当月の実働時間合計
 
-            $links = Task::where('user_id', $user_id)
-            ->get();
+            $links = Task::where('user_id', $user_id)->get();
             foreach($links as $link)
             {
-                if(isset($link->punchIn))
-                {
-                    $temp = Carbon::parse($link->punchIn)->format('Y-m'); //データベースのpunchinをforeachで回しY-mで取得
-                }
+                // if(isset($link->punchIn))
+                // {
+                $temp = Carbon::parse($link->punchIn)->format('Y-m'); //データベースのpunchinをforeachで回しY-mで取得
+                // }
                 $yearMonth[] = $temp;
                 // \Debugbar::info($link->punchIn);
             }
@@ -145,11 +144,11 @@ class RecordController extends Controller
             {
                 $explodeYearMonths[] = explode("-", $linkYearMonth); //年月をexplodeで分割し配列に入れる
             }
-        // } else {
-        //     $dt = Carbon::now()->format("今日はY年m月d日(D)です。");
-        //     $user_id = Auth::id();
-        //     return view('records.index-empty', compact('dt'));
-        // }
+        } else {
+            $dt = Carbon::now()->format("今日はY年m月d日(D)です。");
+            return view('records.index-empty', compact('dt'));
+        }
+
          // \Debugbar::info($explodeYearMonths);
          return view('records.index',
                          compact('dt', 'prevYear','prevMonth', 'nextYear', 'nextMonth', 'tasks', 'date', 'sumWorkTimeInt', 'dayOfWork', 'linkYearMonths', 'explodeYearMonths'));
