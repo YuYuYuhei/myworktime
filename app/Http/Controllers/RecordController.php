@@ -50,7 +50,7 @@ class RecordController extends Controller
         $punchOutTime = $tasks->punchOut;
         // $workTimeInt = $tasks->workTimeInt;
         return view('records.create',
-                      compact('dt', 'diff', 'punchInTime', 'punchOutTime', 'workTimeInt'));
+                      compact('dt', 'diff', 'punchInTime', 'punchOutTime'));
     }
 
     public function storeMemo(Request $request) // store Memo
