@@ -19,7 +19,6 @@ Route::post('/punchIn', 'RecordController@storePunchIn')->middleware('auth');
 Route::post('/punchOut', 'RecordController@storePunchOut')->middleware('auth');
 Route::post('/store', 'RecordController@storeMemo')->middleware('auth');
 Route::get('/', 'RecordController@index')->middleware('auth');
-// Route::get('/{y}/{m}', 'RecordController@index')->middleware('auth');
 Route::get('/records/{id}', 'RecordController@show')->middleware('auth');
 Route::get('records/edit/{id}', 'RecordController@edit')->middleware('auth');
 Route::post('records/edit/{id}', 'RecordController@update')->middleware('auth');

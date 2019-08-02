@@ -20,7 +20,7 @@
                     <div class="form-group row">
                         <label class="col-md-3">出勤時間</label>
                         <input type="datetime" name="punchIn" value="{{ old('punchIn', $task->punchIn) }}">
-                          　　　　　　　<!-- oldヘルパ利用しつつDB Emptyでなければ表示する記述 -->
+                          <!-- oldヘルパ利用しつつDB Emptyでなければ表示する記述 -->
                     </div>
                     <div class="form-group row">
                         <label class="col-md-3">退勤時間</label>
