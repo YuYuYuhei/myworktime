@@ -22,7 +22,28 @@
                         <input type="datetime" name="punchIn" value="{{ old('punchIn', $task->punchIn) }}">
                           <!-- oldヘルパ利用しつつDB Emptyでなければ表示する記述 -->
                     </div>
-                    <div class="form-group row">
+
+                    <div class="orm-group row">
+                        <label class="col-md-3">表示test欄</label>
+                        <input type="hidden" id="abc"  name="punchIn"  value="{{ old('punchIn', $task->punchIn) }}">
+                        <input type="hidden" id="aaa"  name="punchIn"  value="{{ old('punchIn', $punchInHour) }}">
+                        <input type="hidden" id="bbb"  name="punchIn"  value="{{ old('punchIn', $punchInMinute) }}">
+                        <p id="bcd"></p>
+                        <!-- <select class="my-select" multiple>
+                        </select> -->
+
+                        <select class="my-hours" value="">
+
+                        </select><p>時</p>
+                        <select class="my-minutes">
+
+                        </select><p>分</p>
+
+                        <!-- <p id="datetime12">aaa</p> -->
+                        <!-- <span id="ymd_pulldown"></span> -->
+                    </div>
+
+                    <div class="form-group row mt-3">
                         <label class="col-md-3">退勤時間</label>
                         @if ( !empty( $task->punchOut ))
                             <input type="datetime" name="punchOut" value="{{ old('punchOut', $task->punchOut) }}">
@@ -72,4 +93,9 @@
             </form>
         </div>
     </div>
+@endsection
+
+@section('script')
+    <script src="{{ asset('js/index.js') }}"></script>
+    <script src="{{ asset('js/jquery.js') }}"></script>
 @endsection

@@ -87,18 +87,8 @@
             </div>
         </div>
     </div>
-    @section('script')
-    <script> //show confirm window when push "削除" ←nothing understand now(6/16)
-    $(function(){
-        $(".del").click(function(){
-            if(confirm("本当に削除しますか？")){
-                //そのままsubmit（削除）
-            }else{
-                //cancel
-                return false;
-            }
-        });
-    });
-    </script>
-    @endsection
+@endsection
+
+@section('script')
+    <script src="{{ asset('js/public.js') }}"></script>
 @endsection

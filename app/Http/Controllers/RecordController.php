@@ -130,7 +130,8 @@ class RecordController extends Controller
                  ->get();
         foreach($links as $link)
         {
-            $temp = Carbon::parse($link->punchIn)->format('Y-m'); //データベースのpunchinをforeachで回しY-mで取得
+            $temp = Carbon::parse($link->punchIn)->format('Y-m');
+            //データベースのpunchinをforeachで回しY-mで取得
             $yearMonth[] = $temp;
             // $strYearMonth = string date('Y-m', $temp);
             // \Debugbar::info($link->punchIn);
@@ -163,10 +164,14 @@ class RecordController extends Controller
     public function edit($id)
     {
         $task = Task::findOrFail($id);
+        // $hours = config('hours');
         $date = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
+        $punchInHour = Carbon::parse($task->punchIn)->format('H');
+        $punchInMinute = Carbon::parse($task->punchIn)->format('i');
+
         $breakTime = Carbon::parse($task->breakTimeInt)->format('H時間i分');
         $workTime = Carbon::parse($task->workTimeInt)->format('H時間i分');
-        return view('records.edit', compact('task', 'date', 'breakTime', 'workTime'));
+        return view('records.edit', compact('task', 'date', 'breakTime', 'workTime', 'punchInHour', 'punchInMinute', 'hours'));
     }
 
     public function update(Request $request, $id)
