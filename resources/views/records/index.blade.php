@@ -90,7 +90,7 @@
 @endsection
 
 @section('script')
-    <script>
+    <!-- <script>
     $('.del').click(function(){
         if(confirm("本当に削除しますか？")){
             //そのままsubmit（削除）
@@ -99,6 +99,6 @@
             return false;
         }
     });
-    </script>
+    </script> -->
 
 @endsection
