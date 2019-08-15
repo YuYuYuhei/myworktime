@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use App\User;
 use App\Task;
 use Carbon\Carbon;
-use DateTime;
+// use DateTime;
 
 class RecordController extends Controller
 {
@@ -138,6 +138,7 @@ class RecordController extends Controller
                 // \Debugbar::info($link->punchIn);
             }
 
+<<<<<<< HEAD
             $linkYearMonths = array_unique($yearMonth); //データの重複をarray_uniqueで排除
             rsort($linkYearMonths); //並び替え
             foreach($linkYearMonths as $linkYearMonth) //とってきたY-mデータ値を更にforeachで回す
@@ -147,6 +148,17 @@ class RecordController extends Controller
         } else {
             $dt = Carbon::now()->format("今日はY年m月d日(D)です。");
             return view('records.index-empty', compact('dt'));
+=======
+        $links = Task::where('user_id', $user_id)
+                 ->get();
+        foreach($links as $link)
+        {
+            $temp = Carbon::parse($link->punchIn)->format('Y-m');
+            //データベースのpunchinをforeachで回しY-mで取得
+            $yearMonth[] = $temp;
+            // $strYearMonth = string date('Y-m', $temp);
+            // \Debugbar::info($link->punchIn);
+>>>>>>> develop
         }
 
          // \Debugbar::info($explodeYearMonths);
@@ -167,7 +179,7 @@ class RecordController extends Controller
         return view('records.show', compact('task', 'date', 'breakTime', 'workTime'));
     }
 
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $task = Task::findOrFail($id);
         $date = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
@@ -181,6 +193,8 @@ class RecordController extends Controller
         $task = Task::findOrFail($id);
 
         $date = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
+        // $task->punchIn = $request->punchIn;
+        // $punchInEdited = Input::get();
         $task->punchIn = $request->punchIn;
         $task->punchOut = $request->punchOut;
         $task->breakIn = $request->breakIn;
@@ -193,7 +207,6 @@ class RecordController extends Controller
         $task->breakTimeInt = $diffBreak;
         $task->workTimeInt = $diff - $diffBreak;
 
-        // $task->workTimeInt = $this->diffBreakTime($task->punchIn, $task->punchOut, $task->breakTime);
         $task->save();
         return redirect('/');
     }

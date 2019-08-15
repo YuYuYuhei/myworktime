@@ -38,36 +38,37 @@
             @if ( empty($punchInTime) )
                 <form  action="{{ action('RecordController@storePunchIn') }}" method="post" enctype="multipart/form-data">
                     {{ csrf_field() }}
-                    <input type="submit" class="btn btn-info btn-sm active mt-3" value="出勤時間を記録する">
+                    <input type="submit" id="createPunchInBtn" class="btn btn-info btn-sm active mt-3" value="出勤時間を記録する">
                 </form>
             @elseif ( empty($punchOutTime))
                 <form action="{{ action('RecordController@storePunchOut') }}" method="post" enctype="multipart/form-data">
                     {{ csrf_field() }}
-                    <input type="submit" class="btn btn-info btn-sm active mt-3" value="退勤時間を記録する">
+                    <input type="submit" id="createPunchOutBtn" class="btn btn-info btn-sm active mt-3" value="退勤時間を記録する">
                 </form>
             @endif
             @if ((!empty($punchInTime)) && (!empty($punchOutTime)) )
                 <form action=" {{ url('/store' ) }}" method="post" enctype="multipart/form-data"> <!--☆ -->
                     {{ csrf_field() }}
-                        <!-- <div class="form-group row">
-                            <label class="col-md-3" for="breakTime">休憩時間</label>
-                            <input type="time" name="breakTime" value="01:00">
-                            <p>time</p>
-                        </div> -->
-                        <div class="form-group row">
-                            <label class="col-md-3" for="breakIn">休憩入り時間</label>
-                            <input type="datetime" name="breakIn" value="{{ $punchInTime }}">
+                    <div class="form-group row">
+                        <label class="col-md-3" for="breakIn">休憩入り時間</label>
+                        <input type="hidden" id="breakInDef" name="breakIn" value="{{ $punchInTime }}">
+                        <input type="text" id="breakInDefYmd">
+                        <select id="selectBreakInDefHour"></select>時
+                        <select id="selectBreakInDefMinute"></select>分
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3" for="breakOut">休憩戻り時間</label>
+                        <input type="hidden" id="breakOutDef" name="breakOut"  value="{{ $punchOutTime }}">
+                        <input type="text" id="breakOutDefYmd">
+                        <select id="selectBreakOutDefHour"></select>時
+                        <select id="selectBreakOutDefMinute"></select>分
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3" for="memo">メモ(備忘録)</label>
+                        <div class="col-md-10">
+                            <textarea class="form-control" name="memo" rows="8" >{{ old('memo') }}</textarea>
                         </div>
-                        <div class="form-group row">
-                            <label class="col-md-3" for="breakOut">休憩戻り時間</label>
-                            <input type="datetime" name="breakOut"  value="{{ $punchOutTime }}">
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-md-3" for="memo">メモ(備忘録)</label>
-                            <div class="col-md-10">
-                                <textarea class="form-control" name="memo" rows="8" >{{ old('memo') }}</textarea>
-                            </div>
-                        </div>
+                    </div>
                     <input type="submit" class="btn btn-info btn-sm active mt-3" value="休憩時間とメモを保存する">
                 </form>
             @endif
