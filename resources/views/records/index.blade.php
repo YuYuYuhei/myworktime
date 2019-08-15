@@ -90,15 +90,15 @@
 @endsection
 
 @section('script')
-    <!-- <script src="{{ asset('js/index.js') }}"></script> -->
-    <!-- <script>
-        $('#delete').click(function(){
-            if(confirm("本当に削除しますか？")){
-                //そのままsubmit（削除）
-            }else{
-                //cancel
-                return false;
-            }
-        });
-    </script> -->
+    <script>
+    $('.del').click(function(){
+        if(confirm("本当に削除しますか？")){
+            //そのままsubmit（削除）
+        }else{
+            //cancel
+            return false;
+        }
+    });
+    </script>
+
 @endsection
