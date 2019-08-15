@@ -46,7 +46,7 @@
                                                 <form action="{{ action('RecordController@delete', $task->id) }}" method="post" class="index-btn">
                                                     {{ csrf_field() }}
                                                     {{ method_field('delete') }}
-                                                    <input type="submit"  value="削除" class="btn btn-danger btn-sm del">
+                                                    <input type="submit"  value="削除" id="delete" class="btn btn-danger btn-sm del">
                                                 </form>
                                              </th>
                                             <td>{{ $task->punchIn }}</td>
@@ -90,5 +90,15 @@
 @endsection
 
 @section('script')
-    <script src="{{ asset('js/public.js') }}"></script>
+    <!-- <script src="{{ asset('js/index.js') }}"></script> -->
+    <!-- <script>
+        $('#delete').click(function(){
+            if(confirm("本当に削除しますか？")){
+                //そのままsubmit（削除）
+            }else{
+                //cancel
+                return false;
+            }
+        });
+    </script> -->
 @endsection
