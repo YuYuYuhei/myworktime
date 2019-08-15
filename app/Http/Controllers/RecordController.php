@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use App\User;
 use App\Task;
 use Carbon\Carbon;
-use DateTime;
+// use DateTime;
 
 class RecordController extends Controller
 {
@@ -130,7 +130,8 @@ class RecordController extends Controller
                  ->get();
         foreach($links as $link)
         {
-            $temp = Carbon::parse($link->punchIn)->format('Y-m'); //データベースのpunchinをforeachで回しY-mで取得
+            $temp = Carbon::parse($link->punchIn)->format('Y-m');
+            //データベースのpunchinをforeachで回しY-mで取得
             $yearMonth[] = $temp;
             // $strYearMonth = string date('Y-m', $temp);
             // \Debugbar::info($link->punchIn);
@@ -160,7 +161,7 @@ class RecordController extends Controller
         return view('records.show', compact('task', 'date', 'breakTime', 'workTime'));
     }
 
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $task = Task::findOrFail($id);
         $date = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
@@ -174,6 +175,8 @@ class RecordController extends Controller
         $task = Task::findOrFail($id);
 
         $date = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
+        // $task->punchIn = $request->punchIn;
+        // $punchInEdited = Input::get();
         $task->punchIn = $request->punchIn;
         $task->punchOut = $request->punchOut;
         $task->breakIn = $request->breakIn;
@@ -186,7 +189,6 @@ class RecordController extends Controller
         $task->breakTimeInt = $diffBreak;
         $task->workTimeInt = $diff - $diffBreak;
 
-        // $task->workTimeInt = $this->diffBreakTime($task->punchIn, $task->punchOut, $task->breakTime);
         $task->save();
         return redirect('/');
     }

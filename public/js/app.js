@@ -49357,7 +49357,506 @@ if (token) {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
+<<<<<<< HEAD
 throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nError: ENOENT: no such file or directory, open '/Users/Tequila/Desktop/myworktime/mytime/resources/js/combodate.js'");
+=======
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+/**
+* Combodate - 1.0.7
+* Dropdown date and time picker.
+* Converts text input into dropdowns to pick day, month, year, hour, minute and second.
+* Uses momentjs as datetime library http://momentjs.com.
+* For i18n include corresponding file from https://github.com/timrwood/moment/tree/master/lang
+*
+* Confusion at noon and midnight - see http://en.wikipedia.org/wiki/12-hour_clock#Confusion_at_noon_and_midnight
+* In combodate:
+* 12:00 pm --> 12:00 (24-h format, midday)
+* 12:00 am --> 00:00 (24-h format, midnight, start of day)
+*
+* Differs from momentjs parse rules:
+* 00:00 pm, 12:00 pm --> 12:00 (24-h format, day not change)
+* 00:00 am, 12:00 am --> 00:00 (24-h format, day not change)
+*
+*
+* Author: Vitaliy Potapov
+* Project page: http://github.com/vitalets/combodate
+* Copyright (c) 2012 Vitaliy Potapov. Released under MIT License.
+**/
+(function ($) {
+  var Combodate = function Combodate(element, options) {
+    this.$element = $(element);
+
+    if (!this.$element.is('input')) {
+      $.error('Combodate should be applied to INPUT element');
+      return;
+    }
+
+    this.options = $.extend({}, $.fn.combodate.defaults, options, this.$element.data());
+    this.init();
+  };
+
+  Combodate.prototype = {
+    constructor: Combodate,
+    init: function init() {
+      this.map = {
+        //key   regexp    moment.method
+        day: ['D', 'date'],
+        month: ['M', 'month'],
+        year: ['Y', 'year'],
+        hour: ['[Hh]', 'hours'],
+        minute: ['m', 'minutes'],
+        second: ['s', 'seconds'],
+        ampm: ['[Aa]', '']
+      };
+      this.$widget = $('<span class="combodate"></span>').html(this.getTemplate());
+      this.initCombos(); //update original input on change
+
+      this.$widget.on('change', 'select', $.proxy(function (e) {
+        this.$element.val(this.getValue()).change(); // update days count if month or year changes
+
+        if (this.options.smartDays) {
+          if ($(e.target).is('.month') || $(e.target).is('.year')) {
+            this.fillCombo('day');
+          }
+        }
+      }, this));
+      this.$widget.find('select').css('width', 'auto'); // hide original input and insert widget
+
+      this.$element.hide().after(this.$widget); // set initial value
+
+      this.setValue(this.$element.val() || this.options.value);
+    },
+
+    /*
+     Replace tokens in template with <select> elements
+    */
+    getTemplate: function getTemplate() {
+      var tpl = this.options.template;
+      var customClass = this.options.customClass; //first pass
+
+      $.each(this.map, function (k, v) {
+        v = v[0];
+        var r = new RegExp(v + '+'),
+            token = v.length > 1 ? v.substring(1, 2) : v;
+        tpl = tpl.replace(r, '{' + token + '}');
+      }); //replace spaces with &nbsp;
+
+      tpl = tpl.replace(/ /g, '&nbsp;'); //second pass
+
+      $.each(this.map, function (k, v) {
+        v = v[0];
+        var token = v.length > 1 ? v.substring(1, 2) : v;
+        tpl = tpl.replace('{' + token + '}', '<select class="' + k + ' ' + customClass + '"></select>');
+      });
+      return tpl;
+    },
+
+    /*
+     Initialize combos that presents in template
+    */
+    initCombos: function initCombos() {
+      for (var k in this.map) {
+        var $c = this.$widget.find('.' + k); // set properties like this.$day, this.$month etc.
+
+        this['$' + k] = $c.length ? $c : null; // fill with items
+
+        this.fillCombo(k);
+      }
+    },
+
+    /*
+     Fill combo with items
+    */
+    fillCombo: function fillCombo(k) {
+      var $combo = this['$' + k];
+
+      if (!$combo) {
+        return;
+      } // define method name to fill items, e.g `fillDays`
+
+
+      var f = 'fill' + k.charAt(0).toUpperCase() + k.slice(1);
+      var items = this[f]();
+      var value = $combo.val();
+      $combo.empty();
+
+      for (var i = 0; i < items.length; i++) {
+        $combo.append('<option value="' + items[i][0] + '">' + items[i][1] + '</option>');
+      }
+
+      $combo.val(value);
+    },
+
+    /*
+     Initialize items of combos. Handles `firstItem` option
+    */
+    fillCommon: function fillCommon(key) {
+      var values = [],
+          relTime;
+
+      if (this.options.firstItem === 'name') {
+        //need both to support moment ver < 2 and  >= 2
+        relTime = moment.relativeTime || moment.langData()._relativeTime;
+        var header = typeof relTime[key] === 'function' ? relTime[key](1, true, key, false) : relTime[key]; //take last entry (see momentjs lang files structure)
+
+        header = header.split(' ').reverse()[0];
+        values.push(['', header]);
+      } else if (this.options.firstItem === 'empty') {
+        values.push(['', '']);
+      }
+
+      return values;
+    },
+
+    /*
+    fill day
+    */
+    fillDay: function fillDay() {
+      var items = this.fillCommon('d'),
+          name,
+          i,
+          twoDigit = this.options.template.indexOf('DD') !== -1,
+          daysCount = 31; // detect days count (depends on month and year)
+      // originally https://github.com/vitalets/combodate/pull/7
+
+      if (this.options.smartDays && this.$month && this.$year) {
+        var month = parseInt(this.$month.val(), 10);
+        var year = parseInt(this.$year.val(), 10);
+
+        if (!isNaN(month) && !isNaN(year)) {
+          daysCount = moment([year, month]).daysInMonth();
+        }
+      }
+
+      for (i = 1; i <= daysCount; i++) {
+        name = twoDigit ? this.leadZero(i) : i;
+        items.push([i, name]);
+      }
+
+      return items;
+    },
+
+    /*
+    fill month
+    */
+    fillMonth: function fillMonth() {
+      var items = this.fillCommon('M'),
+          name,
+          i,
+          longNames = this.options.template.indexOf('MMMM') !== -1,
+          shortNames = this.options.template.indexOf('MMM') !== -1,
+          twoDigit = this.options.template.indexOf('MM') !== -1;
+
+      for (i = 0; i <= 11; i++) {
+        if (longNames) {
+          //see https://github.com/timrwood/momentjs.com/pull/36
+          name = moment().date(1).month(i).format('MMMM');
+        } else if (shortNames) {
+          name = moment().date(1).month(i).format('MMM');
+        } else if (twoDigit) {
+          name = this.leadZero(i + 1);
+        } else {
+          name = i + 1;
+        }
+
+        items.push([i, name]);
+      }
+
+      return items;
+    },
+
+    /*
+    fill year
+    */
+    fillYear: function fillYear() {
+      var items = [],
+          name,
+          i,
+          longNames = this.options.template.indexOf('YYYY') !== -1;
+
+      for (i = this.options.maxYear; i >= this.options.minYear; i--) {
+        name = longNames ? i : (i + '').substring(2);
+        items[this.options.yearDescending ? 'push' : 'unshift']([i, name]);
+      }
+
+      items = this.fillCommon('y').concat(items);
+      return items;
+    },
+
+    /*
+    fill hour
+    */
+    fillHour: function fillHour() {
+      var items = this.fillCommon('h'),
+          name,
+          i,
+          h12 = this.options.template.indexOf('h') !== -1,
+          h24 = this.options.template.indexOf('H') !== -1,
+          twoDigit = this.options.template.toLowerCase().indexOf('hh') !== -1,
+          min = h12 ? 1 : 0,
+          max = h12 ? 12 : 23;
+
+      for (i = min; i <= max; i++) {
+        name = twoDigit ? this.leadZero(i) : i;
+        items.push([i, name]);
+      }
+
+      return items;
+    },
+
+    /*
+    fill minute
+    */
+    fillMinute: function fillMinute() {
+      var items = this.fillCommon('m'),
+          name,
+          i,
+          twoDigit = this.options.template.indexOf('mm') !== -1;
+
+      for (i = 0; i <= 59; i += this.options.minuteStep) {
+        name = twoDigit ? this.leadZero(i) : i;
+        items.push([i, name]);
+      }
+
+      return items;
+    },
+
+    /*
+    fill second
+    */
+    fillSecond: function fillSecond() {
+      var items = this.fillCommon('s'),
+          name,
+          i,
+          twoDigit = this.options.template.indexOf('ss') !== -1;
+
+      for (i = 0; i <= 59; i += this.options.secondStep) {
+        name = twoDigit ? this.leadZero(i) : i;
+        items.push([i, name]);
+      }
+
+      return items;
+    },
+
+    /*
+    fill ampm
+    */
+    fillAmpm: function fillAmpm() {
+      var ampmL = this.options.template.indexOf('a') !== -1,
+          ampmU = this.options.template.indexOf('A') !== -1,
+          items = [['am', ampmL ? 'am' : 'AM'], ['pm', ampmL ? 'pm' : 'PM']];
+      return items;
+    },
+
+    /*
+     Returns current date value from combos.
+     If format not specified - `options.format` used.
+     If format = `null` - Moment object returned.
+    */
+    getValue: function getValue(format) {
+      var dt,
+          values = {},
+          that = this,
+          notSelected = false; //getting selected values
+
+      $.each(this.map, function (k, v) {
+        if (k === 'ampm') {
+          return;
+        }
+
+        var def = k === 'day' ? 1 : 0;
+        values[k] = that['$' + k] ? parseInt(that['$' + k].val(), 10) : def;
+
+        if (isNaN(values[k])) {
+          notSelected = true;
+          return false;
+        }
+      }); //if at least one visible combo not selected - return empty string
+
+      if (notSelected) {
+        return '';
+      } //convert hours 12h --> 24h
+
+
+      if (this.$ampm) {
+        //12:00 pm --> 12:00 (24-h format, midday), 12:00 am --> 00:00 (24-h format, midnight, start of day)
+        if (values.hour === 12) {
+          values.hour = this.$ampm.val() === 'am' ? 0 : 12;
+        } else {
+          values.hour = this.$ampm.val() === 'am' ? values.hour : values.hour + 12;
+        }
+      }
+
+      dt = moment([values.year, values.month, values.day, values.hour, values.minute, values.second]); //highlight invalid date
+
+      this.highlight(dt);
+      format = format === undefined ? this.options.format : format;
+
+      if (format === null) {
+        return dt.isValid() ? dt : null;
+      } else {
+        return dt.isValid() ? dt.format(format) : '';
+      }
+    },
+    setValue: function setValue(value) {
+      if (!value) {
+        return;
+      } // parse in strict mode (third param `true`)
+
+
+      var dt = typeof value === 'string' ? moment(value, this.options.format, true) : moment(value),
+          that = this,
+          values = {}; //function to find nearest value in select options
+
+      function getNearest($select, value) {
+        var delta = {};
+        $select.children('option').each(function (i, opt) {
+          var optValue = $(opt).attr('value'),
+              distance;
+          if (optValue === '') return;
+          distance = Math.abs(optValue - value);
+
+          if (typeof delta.distance === 'undefined' || distance < delta.distance) {
+            delta = {
+              value: optValue,
+              distance: distance
+            };
+          }
+        });
+        return delta.value;
+      }
+
+      if (dt.isValid()) {
+        //read values from date object
+        $.each(this.map, function (k, v) {
+          if (k === 'ampm') {
+            return;
+          }
+
+          values[k] = dt[v[1]]();
+        });
+
+        if (this.$ampm) {
+          //12:00 pm --> 12:00 (24-h format, midday), 12:00 am --> 00:00 (24-h format, midnight, start of day)
+          if (values.hour >= 12) {
+            values.ampm = 'pm';
+
+            if (values.hour > 12) {
+              values.hour -= 12;
+            }
+          } else {
+            values.ampm = 'am';
+
+            if (values.hour === 0) {
+              values.hour = 12;
+            }
+          }
+        }
+
+        $.each(values, function (k, v) {
+          //call val() for each existing combo, e.g. this.$hour.val()
+          if (that['$' + k]) {
+            if (k === 'minute' && that.options.minuteStep > 1 && that.options.roundTime) {
+              v = getNearest(that['$' + k], v);
+            }
+
+            if (k === 'second' && that.options.secondStep > 1 && that.options.roundTime) {
+              v = getNearest(that['$' + k], v);
+            }
+
+            that['$' + k].val(v);
+          }
+        }); // update days count
+
+        if (this.options.smartDays) {
+          this.fillCombo('day');
+        }
+
+        this.$element.val(dt.format(this.options.format)).change();
+      }
+    },
+
+    /*
+     highlight combos if date is invalid
+    */
+    highlight: function highlight(dt) {
+      if (!dt.isValid()) {
+        if (this.options.errorClass) {
+          this.$widget.addClass(this.options.errorClass);
+        } else {
+          //store original border color
+          if (!this.borderColor) {
+            this.borderColor = this.$widget.find('select').css('border-color');
+          }
+
+          this.$widget.find('select').css('border-color', 'red');
+        }
+      } else {
+        if (this.options.errorClass) {
+          this.$widget.removeClass(this.options.errorClass);
+        } else {
+          this.$widget.find('select').css('border-color', this.borderColor);
+        }
+      }
+    },
+    leadZero: function leadZero(v) {
+      return v <= 9 ? '0' + v : v;
+    },
+    destroy: function destroy() {
+      this.$widget.remove();
+      this.$element.removeData('combodate').show();
+    } //todo: clear method
+
+  };
+
+  $.fn.combodate = function (option) {
+    var d,
+        args = Array.apply(null, arguments);
+    args.shift(); //getValue returns date as string / object (not jQuery object)
+
+    if (option === 'getValue' && this.length && (d = this.eq(0).data('combodate'))) {
+      return d.getValue.apply(d, args);
+    }
+
+    return this.each(function () {
+      var $this = $(this),
+          data = $this.data('combodate'),
+          options = _typeof(option) == 'object' && option;
+
+      if (!data) {
+        $this.data('combodate', data = new Combodate(this, options));
+      }
+
+      if (typeof option == 'string' && typeof data[option] == 'function') {
+        data[option].apply(data, args);
+      }
+    });
+  };
+
+  $.fn.combodate.defaults = {
+    //in this format value stored in original input
+    format: 'DD-MM-YYYY HH:mm',
+    //in this format items in dropdowns are displayed
+    template: 'D / MMM / YYYY   H : mm',
+    //initial value, can be `new Date()`
+    value: null,
+    minYear: 1970,
+    maxYear: 2015,
+    yearDescending: true,
+    minuteStep: 5,
+    secondStep: 1,
+    firstItem: 'empty',
+    //'name', 'empty', 'none'
+    errorClass: null,
+    customClass: '',
+    roundTime: true,
+    // whether to round minutes and seconds if step > 1
+    smartDays: false // whether days in combo depend on selected month: 31, 30, 28
+
+  };
+})(window.jQuery);
+>>>>>>> use-datepicker
 
 /***/ }),
 
@@ -49437,7 +49936,116 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports) {
 
+<<<<<<< HEAD
 throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nError: ENOENT: no such file or directory, open '/Users/Tequila/Desktop/myworktime/mytime/resources/js/create.blade.jquery.js'");
+=======
+$(function () {
+  //------------------
+  //プルダウンメニュー at create.blade.php, edit.blade.php
+  var hh = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
+  var mm = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59']; //-------------------------------
+  // breakInDefプルダウン処理 create.blade.php
+
+  var breakInDef = $('#breakInDef').val();
+  var breakInDefSplit = breakInDef.split(' ');
+  var breakInDefYmd = breakInDefSplit[0];
+  var breakInDefHis = breakInDefSplit[1];
+  var breakInDefHisSplit = breakInDefHis.split(':');
+  var breakInDefH = breakInDefHisSplit[0];
+  var breakInDefM = breakInDefHisSplit[1];
+  var breakInDefS = breakInDefHisSplit[2];
+  var hh,
+      $selectBreakInDefHour = $('#selectBreakInDefHour'),
+      $optionBreakInDefHours,
+      optionsBreakInDefHours,
+      isSelectedBreakInDefHour;
+  optionsBreakInDefHours = $.map(hh, function (name, value) {
+    isSelectedBreakInDefHour = name === breakInDefH;
+    $optionBreakInDefHours = $('<option>', {
+      value: value,
+      text: name,
+      selected: isSelectedBreakInDefHour
+    });
+    return $optionBreakInDefHours;
+  });
+  $selectBreakInDefHour.append(optionsBreakInDefHours);
+  var mm,
+      $selectBreakInDefMinute = $('#selectBreakInDefMinute'),
+      $optionBreakInDefMinutes,
+      optionsBreakInDefMinutes,
+      isSelectedBreakInDefMinute;
+  optionsBreakInDefMinutes = $.map(mm, function (name, value) {
+    isSelectedBreakInDefMinute = name === breakInDefM;
+    $optionBreakInDefMinutes = $('<option>', {
+      value: value,
+      text: name,
+      selected: isSelectedBreakInDefMinute
+    });
+    return $optionBreakInDefMinutes;
+  });
+  $selectBreakInDefMinute.append(optionsBreakInDefMinutes);
+  $('#breakInDefYmd').val(breakInDefYmd);
+  $('#breakInDefYmd').datepicker({
+    dateFormat: 'yy-mm-dd'
+  });
+  $('#createPunchInBtn').click(function () {
+    var breakInDefYmdEdited = $('#breakInDefYmd').val();
+    var breakInDefHEdited = $('select[id=selectBreakInDefHour] > option:selected').text();
+    var breakInDefMEdited = $('select[id=selectBreakInDefMinute] > option:selected').text();
+    $('#breakInDef').val(breakInDefYmdEdited + ' ' + breakInDefHEdited + ':' + breakInDefMEdited + ':' + breakInDefS);
+  }); //-------------------------------
+  // breakOutDefプルダウン処理
+
+  var breakOutDef = $('#breakOutDef').val();
+  var breakOutDefSplit = breakOutDef.split(' ');
+  var breakOutDefYmd = breakOutDefSplit[0];
+  var breakOutDefHis = breakOutDefSplit[1];
+  var breakOutDefHisSplit = breakOutDefHis.split(':');
+  var breakOutDefH = breakOutDefHisSplit[0];
+  var breakOutDefM = breakOutDefHisSplit[1];
+  var breakOutDefS = breakOutDefHisSplit[2];
+  var hh,
+      $selectBreakOutDefHour = $('#selectBreakOutDefHour'),
+      $optionBreakOutDefHours,
+      optionsBreakOutDefHours,
+      isSelectedBreakOutDefHour;
+  optionsBreakOutDefHours = $.map(hh, function (name, value) {
+    isSelectedBreakOutDefHour = name === breakOutDefH;
+    $optionBreakOutDefHours = $('<option>', {
+      value: value,
+      text: name,
+      selected: isSelectedBreakOutDefHour
+    });
+    return $optionBreakOutDefHours;
+  });
+  $selectBreakOutDefHour.append(optionsBreakOutDefHours);
+  var mm,
+      $selectBreakOutDefMinute = $('#selectBreakOutDefMinute'),
+      $optionBreakOutDefMinutes,
+      optionsBreakOutDefMinutes,
+      isSelectedBreakOutDefMinute;
+  optionsBreakOutDefMinutes = $.map(mm, function (name, value) {
+    isSelectedBreakOutDefMinute = name === breakOutDefM;
+    $optionBreakOutDefMinutes = $('<option>', {
+      value: value,
+      text: name,
+      selected: isSelectedBreakOutDefMinute
+    });
+    return $optionBreakOutDefMinutes;
+  });
+  $selectBreakOutDefMinute.append(optionsBreakOutDefMinutes);
+  $('#breakOutDefYmd').val(breakOutDefYmd);
+  $('#breakOutDefYmd').datepicker({
+    dateFormat: 'yy-mm-dd'
+  });
+  $('#createPunchOutBtn').click(function () {
+    var breakOutDefYmdEdited = $('#breakOutDefYmd').val();
+    var breakOutDefHEdited = $('select[id=selectBreakOutDefHour] > option:selected').text();
+    var breakOutDefMEdited = $('select[id=selectBreakOutDefMinute] > option:selected').text();
+    $('#breakOutDef').val(breakOutDefYmdEdited + ' ' + breakOutDefHEdited + ':' + breakOutDefMEdited + ':' + breakOutDefS);
+  });
+});
+>>>>>>> use-datepicker
 
 /***/ }),
 
@@ -49757,7 +50365,20 @@ $(function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
+<<<<<<< HEAD
 throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: /Users/Tequila/Desktop/myworktime/mytime/resources/js/index.js: Unexpected token (1:0)\n\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 1 | \u001b[39m\u001b[33m<\u001b[39m\u001b[33mscript\u001b[39m\u001b[33m>\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m   | \u001b[39m\u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 2 | \u001b[39m$(\u001b[36mfunction\u001b[39m(){\u001b[0m\n\u001b[0m \u001b[90m 3 | \u001b[39m    $(\u001b[32m\"del\"\u001b[39m)\u001b[33m.\u001b[39mclick(\u001b[36mfunction\u001b[39m(){\u001b[0m\n\u001b[0m \u001b[90m 4 | \u001b[39m        \u001b[36mif\u001b[39m(confirm(\u001b[32m\"本当に削除しますか？\"\u001b[39m)){\u001b[0m\n    at Parser.raise (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/parser/lib/index.js:6322:17)\n    at Parser.unexpected (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/parser/lib/index.js:7638:16)\n    at Parser.parseExprAtom (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/parser/lib/index.js:8799:20)\n    at Parser.parseExprSubscripts (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/parser/lib/index.js:8385:23)\n    at Parser.parseMaybeUnary (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/parser/lib/index.js:8365:21)\n    at Parser.parseExprOps (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/parser/lib/index.js:8252:23)\n    at Parser.parseMaybeConditional (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/parser/lib/index.js:8225:23)\n    at Parser.parseMaybeAssign (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/parser/lib/index.js:8172:21)\n    at Parser.parseExpression (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/parser/lib/index.js:8120:23)\n    at Parser.parseStatementContent (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/parser/lib/index.js:9892:23)\n    at Parser.parseStatement (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/parser/lib/index.js:9763:17)\n    at Parser.parseBlockOrModuleBlockBody (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/parser/lib/index.js:10340:25)\n    at Parser.parseBlockBody (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/parser/lib/index.js:10327:10)\n    at Parser.parseTopLevel (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/parser/lib/index.js:9692:10)\n    at Parser.parse (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/parser/lib/index.js:11209:17)\n    at parse (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/parser/lib/index.js:11245:38)\n    at parser (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/core/lib/transformation/normalize-file.js:170:34)\n    at normalizeFile (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/core/lib/transformation/normalize-file.js:138:11)\n    at runSync (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/core/lib/transformation/index.js:44:43)\n    at runAsync (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/core/lib/transformation/index.js:35:14)\n    at process.nextTick (/Users/Tequila/Desktop/myworktime/mytime/node_modules/@babel/core/lib/transform.js:34:34)\n    at _combinedTickCallback (internal/process/next_tick.js:131:7)\n    at process._tickCallback (internal/process/next_tick.js:180:9)");
+=======
+$(function () {
+  // editページ delete confirm
+  $("del").click(function () {
+    if (confirm("本当に削除しますか？")) {//そのままsubmit（削除）
+    } else {
+      //cancel
+      return false;
+    }
+  });
+});
+>>>>>>> use-datepicker
 
 /***/ }),
 
