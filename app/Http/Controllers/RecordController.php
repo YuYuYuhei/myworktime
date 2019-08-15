@@ -161,17 +161,13 @@ class RecordController extends Controller
         return view('records.show', compact('task', 'date', 'breakTime', 'workTime'));
     }
 
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $task = Task::findOrFail($id);
-        // $hours = config('hours');
         $date = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
-        $punchInHour = Carbon::parse($task->punchIn)->format('H');
-        $punchInMinute = Carbon::parse($task->punchIn)->format('i');
-
         $breakTime = Carbon::parse($task->breakTimeInt)->format('H時間i分');
         $workTime = Carbon::parse($task->workTimeInt)->format('H時間i分');
-        return view('records.edit', compact('task', 'date', 'breakTime', 'workTime', 'punchInHour', 'punchInMinute', 'hours'));
+        return view('records.edit', compact('task', 'date', 'breakTime', 'workTime'));
     }
 
     public function update(Request $request, $id)
@@ -179,6 +175,8 @@ class RecordController extends Controller
         $task = Task::findOrFail($id);
 
         $date = Carbon::parse($task->punchIn)->format('Y/m/d(D)');
+        // $task->punchIn = $request->punchIn;
+        // $punchInEdited = Input::get();
         $task->punchIn = $request->punchIn;
         $task->punchOut = $request->punchOut;
         $task->breakIn = $request->breakIn;
@@ -191,7 +189,6 @@ class RecordController extends Controller
         $task->breakTimeInt = $diffBreak;
         $task->workTimeInt = $diff - $diffBreak;
 
-        // $task->workTimeInt = $this->diffBreakTime($task->punchIn, $task->punchOut, $task->breakTime);
         $task->save();
         return redirect('/');
     }
