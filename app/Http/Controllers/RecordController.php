@@ -124,6 +124,7 @@ class RecordController extends Controller
             // \Debugbar::info($link->punchIn);
         }
          $linkYearMonths = array_unique($yearMonth); //データの重複をarray_uniqueで排除
+         // $linkYearMonths = (!empty($temp))? array_unique($yearMonth): $yearMonth = $yearMonth[] ;
          rsort($linkYearMonths); //並び替え
          // list($year, $month) = preg_split('/[-]/', $linkYearMonths);
          foreach($linkYearMonths as $linkYearMonth) //とってきたY-mデータ値を更にforeachで回す
@@ -132,7 +133,7 @@ class RecordController extends Controller
          }
          // \Debugbar::info($explodeYearMonths);
          return view('records.index',
-                         compact('dt', 'prevYear','prevMonth', 'nextYear', 'nextMonth', 'tasks', 'date', 'sumWorkTimeInt', 'dayOfWork', 'linkYearMonths', 'explodeYearMonths'));
+                         compact('dt', 'prevYear','prevMonth', 'nextYear', 'nextMonth', 'tasks', 'temp', 'date', 'sumWorkTimeInt', 'dayOfWork', 'linkYearMonths', 'explodeYearMonths'));
     }
     public function show(Request $request, $id)
     {
