@@ -133,7 +133,7 @@ class RecordController extends Controller
          }
          // \Debugbar::info($explodeYearMonths);
          return view('records.index',
-                         compact('dt', 'prevYear','prevMonth', 'nextYear', 'nextMonth', 'tasks', 'temp', 'date', 'sumWorkTimeInt', 'dayOfWork', 'linkYearMonths', 'explodeYearMonths'));
+                         compact('dt', 'prevYear','prevMonth', 'nextYear', 'nextMonth', 'tasks', 'date', 'sumWorkTimeInt', 'dayOfWork', 'linkYearMonths', 'explodeYearMonths'));
     }
     public function show(Request $request, $id)
     {

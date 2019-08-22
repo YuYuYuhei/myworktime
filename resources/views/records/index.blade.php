@@ -74,7 +74,7 @@
                                 <!-- 全部の列を計算している -->
                         </tbody>
                     </table>
-                    <!-- <span>{{ $yearMonth }}</span> -->
+                    
                 </section>
             </div>
             <div class="col-2 disp" >
