@@ -74,14 +74,16 @@
                                 <!-- 全部の列を計算している -->
                         </tbody>
                     </table>
-                    
+
                 </section>
             </div>
             <div class="col-2 disp" >
                 <!-- <p class="disp-month">2019/06</p> -->
+                @if($explodeYearMonths==null)
                     @foreach($explodeYearMonths as $explodeYearMonth)
                         <a href="{{ action('RecordController@index', ['year' => $explodeYearMonth[0], 'month' => $explodeYearMonth[1]]) }}" class="disp-month">{{ $explodeYearMonth[0].'-'.$explodeYearMonth[1] }}</a>
                     @endforeach
+                @endif
             </div>
         </div>
     </div>

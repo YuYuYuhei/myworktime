@@ -72,6 +72,8 @@ class RecordController extends Controller
     }
     public function index(Request $request) // here is top page
     {
+
+
         $user_id = Auth::id();
         if((isset($request->year)) && (isset($request->month)))
         {
@@ -115,14 +117,17 @@ class RecordController extends Controller
                                 ->sum('workTimeInt'); // 該当月の実働時間合計
         $links = Task::where('user_id', $user_id)
                  ->get();
+        $yearMonth[] = null;
         foreach($links as $link)
         {
+
             $temp = Carbon::parse($link->punchIn)->format('Y-m');
             //データベースのpunchinをforeachで回しY-mで取得
             $yearMonth[] = $temp;
             // $strYearMonth = string date('Y-m', $temp);
             // \Debugbar::info($link->punchIn);
         }
+
          $linkYearMonths = array_unique($yearMonth); //データの重複をarray_uniqueで排除
          // $linkYearMonths = (!empty($temp))? array_unique($yearMonth): $yearMonth = $yearMonth[] ;
          rsort($linkYearMonths); //並び替え
